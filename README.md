@@ -19,7 +19,7 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 1 core ledger foundation is in review.
+Sprint 1 core ledger foundation is merged to `main`. The project is ready for Sprint 2 planning.
 
 ## Development Commands
 

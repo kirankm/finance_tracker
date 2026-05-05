@@ -157,7 +157,7 @@ Results:
 
 Host-only Python checks were not run because the host is missing `python3.12-venv` and `python3-pip`. README documents the required packages.
 
-No git remote is configured, so remote CI was not observed from this server. The GitHub Actions workflow exists and the Docker-based local checks pass.
+Remote CI was not observed during Sprint 0 because no git remote was configured at that time. A GitHub remote was configured later, and Sprint 1 verified GitHub Actions.
 
 Linode VPS was identified as the target deployment environment during review. Added deployment notes for Docker Compose, HTTPS, firewalling, secrets, and backups.
 

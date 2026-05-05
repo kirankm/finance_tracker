@@ -88,3 +88,4 @@ Implementation continued after review approval on 2026-05-05.
 - Remote CI initially failed during dependency installation because setuptools auto-discovered non-package top-level directories. Fixed by explicitly packaging only `app`.
 - Remote CI passed on GitHub Actions for commit `33dd88b`.
 - Sprint 1 marked done on 2026-05-05 after remote CI passed and merge preparation started.
+- Sprint 1 merged to `main` with merge commit `90af554`, and GitHub Actions passed on `main`.
