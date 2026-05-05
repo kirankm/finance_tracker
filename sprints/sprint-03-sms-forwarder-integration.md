@@ -118,7 +118,9 @@ Implementation continued after review approval on 2026-05-05.
 - Added deterministic selected-forwarder payload mapping into the internal inbound SMS contract.
 - Added deterministic message IDs for selected-forwarder payloads so duplicate delivery remains idempotent.
 - Added selected-forwarder contract tests first, confirmed they failed before implementation, then made them pass.
-- `docker compose run --rm app python -m pytest` passed with 25 tests.
+- Review hardening added validation for impossible numeric `receivedStamp` values so malformed selected-forwarder payloads return 422 instead of raising an internal exception.
+- Review hardening added a production startup guard against the development inbound SMS shared secret.
+- `docker compose run --rm app python -m pytest` passed with 27 tests.
 - `docker compose run --rm app python -m ruff check .` passed.
 - `docker compose run --rm app python -m mypy` passed with no issues in 14 source files.
 - Deployed Sprint 3 build to the public HTTPS stack for fake-payload QA.

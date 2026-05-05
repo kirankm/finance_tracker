@@ -21,7 +21,7 @@ Sprint 2: SMS Ingestion and Parsing
 
 ## Current Focus
 
-Review Sprint 3 selected forwarder adapter after passing Docker checks and fake HTTPS QA.
+Review Sprint 3 selected forwarder adapter after Docker checks, fake HTTPS QA, and review hardening fixes.
 
 ## Current Branch
 

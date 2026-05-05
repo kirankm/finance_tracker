@@ -20,6 +20,11 @@ def test_inbound_sms_secret_cannot_be_blank() -> None:
         Settings(inbound_sms_secret="   ")
 
 
+def test_production_rejects_development_inbound_sms_secret() -> None:
+    with pytest.raises(ValidationError):
+        Settings(environment="production", inbound_sms_secret="change-me-in-development")
+
+
 def test_settings_ignore_unrelated_deployment_dotenv_values(tmp_path: Path) -> None:
     dotenv_path = tmp_path / ".env"
     dotenv_path.write_text("CADDY_DOMAIN=daily-expense.duckdns.org\n", encoding="utf-8")

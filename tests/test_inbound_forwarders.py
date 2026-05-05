@@ -81,6 +81,21 @@ def test_selected_forwarder_rejects_malformed_payload_without_persistence() -> N
         assert session.scalars(select(RawSmsMessage)).all() == []
 
 
+def test_selected_forwarder_rejects_invalid_epoch_timestamp_without_persistence() -> None:
+    payload = selected_forwarder_payload()
+    payload["receivedStamp"] = "999999999999999999999999999999"
+
+    with make_test_client() as (client, session):
+        response = client.post(
+            "/api/forwarders/android-income-sms-webhook",
+            headers={"X-Inbound-SMS-Secret": "change-me-in-development"},
+            json=payload,
+        )
+
+        assert response.status_code == 422
+        assert session.scalars(select(RawSmsMessage)).all() == []
+
+
 def test_selected_forwarder_maps_fake_payload_to_internal_ingestion_contract() -> None:
     with make_test_client() as (client, session):
         response = client.post(

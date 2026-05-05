@@ -50,6 +50,10 @@ class AndroidIncomeSmsWebhookPayload(BaseModel):
     def received_stamp_must_be_epoch_milliseconds(cls, value: str) -> str:
         if not value.isdecimal():
             raise ValueError("receivedStamp must be epoch milliseconds")
+        try:
+            datetime.fromtimestamp(int(value) / 1000, tz=UTC)
+        except (OSError, OverflowError, ValueError) as exc:
+            raise ValueError("receivedStamp must be a valid epoch millisecond value") from exc
         return value
 
     def to_inbound_sms_payload(self) -> InboundSmsPayload:
