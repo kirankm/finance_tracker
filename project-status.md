@@ -6,7 +6,7 @@
 
 ## Sprint Status
 
-planning
+review
 
 Allowed values:
 - planning
@@ -21,7 +21,7 @@ Sprint 0: Project Setup
 
 ## Current Focus
 
-Plan the core ledger foundation: transaction, account, and audit model.
+Review the Sprint 1 core ledger foundation implementation.
 
 ## Current Branch
 
