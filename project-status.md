@@ -6,7 +6,7 @@ Sprint 7: Duplicate Detection
 
 ## Sprint Status
 
-review
+done
 
 Allowed values:
 - planning
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 6: Ledger Promotion
+Sprint 7: Duplicate Detection
 
 ## Current Focus
 
-Open Sprint 7 PR and wait for CI.
+Plan Sprint 8 ledger sanity checks.
 
 ## Current Branch
 
-`sprint-07-duplicate-detection`
+`main`
 
 ## Open Blockers
 
@@ -44,5 +44,5 @@ V1 roadmap through the V2 planning boundary is drafted in `docs/roadmap-2026-05-
 
 Sprint 6 PR checks passed and the PR was merged to `main`.
 
-Sprint 7 duplicate detection implementation and local QA are complete on
-`sprint-07-duplicate-detection`; CI review is next.
+Sprint 7 duplicate detection implementation and local QA are complete; CI
+passed and PR #6 was merged to `main`.

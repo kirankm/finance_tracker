@@ -105,3 +105,4 @@ Sprint plan created on 2026-05-05. Implementation continued after explicit user 
 - Recorded Decision 0012 for duplicate detection during promotion and conservative exclusion of possible duplicates.
 - Updated the risk register to mark the Sprint 6 duplicate-promotion risk mitigated and track possible duplicate false positives.
 - Local HTTP QA verified fake unique promotion (`duplicate_status: unique`, `ledger_status: included`), exact duplicate promotion (`exact_duplicate`, `excluded`), possible duplicate promotion (`possible_duplicate`, `excluded`), replay idempotency, persisted duplicate metadata, and one audit event per new promotion.
+- GitHub Actions passed on PR #6, and the PR was squash-merged to `main`.
