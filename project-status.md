@@ -2,11 +2,11 @@
 
 ## Current Sprint
 
-Sprint 4: Rules and Categorization
+Sprint 5: Review Queue
 
 ## Sprint Status
 
-done
+review
 
 Allowed values:
 - planning
@@ -21,11 +21,11 @@ Sprint 4: Rules and Categorization
 
 ## Current Focus
 
-Plan Sprint 5 review queue.
+Review Sprint 5 implementation.
 
 ## Current Branch
 
-`main`
+`sprint-05-review-queue`
 
 ## Open Blockers
 

@@ -15,6 +15,14 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.database import get_db_session
 from app.models import RawSmsMessage
+from app.review_queue import (
+    ReviewDecisionPayload,
+    ReviewQueueDetail,
+    ReviewQueueResponse,
+    get_review_item_detail,
+    list_pending_review_items,
+    mark_review_item_reviewed,
+)
 from app.rules import enrich_candidate
 from app.sms_parser import parse_sms
 
@@ -93,7 +101,10 @@ async def require_inbound_sms_secret(
         "/api/forwarders/android-income-sms-webhook",
     }
     if (
-        request.url.path in protected_paths
+        (
+            request.url.path in protected_paths
+            or request.url.path.startswith("/api/review-queue")
+        )
         and not is_authorized_inbound_sms_request(request)
     ):
         return Response(
@@ -186,6 +197,30 @@ def receive_android_income_sms_webhook(
         db_session,
         source="android_income_sms_webhook",
     )
+
+
+@app.get("/api/review-queue", response_model=ReviewQueueResponse)
+def review_queue(
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> ReviewQueueResponse:
+    return list_pending_review_items(db_session)
+
+
+@app.get("/api/review-queue/{raw_sms_id}", response_model=ReviewQueueDetail)
+def review_queue_detail(
+    raw_sms_id: str,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> ReviewQueueDetail:
+    return get_review_item_detail(db_session, raw_sms_id)
+
+
+@app.post("/api/review-queue/{raw_sms_id}/review", response_model=ReviewQueueDetail)
+def review_queue_mark_reviewed(
+    raw_sms_id: str,
+    payload: ReviewDecisionPayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> ReviewQueueDetail:
+    return mark_review_item_reviewed(db_session, raw_sms_id, payload)
 
 
 @app.get("/", response_class=HTMLResponse)

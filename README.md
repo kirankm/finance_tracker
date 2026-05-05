@@ -22,7 +22,8 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 Sprint 4 rules and categorization is merged to `main`. The app has authenticated
 SMS ingestion, the selected Android forwarder adapter, and deterministic
 fake-rule enrichment for account mapping, merchant normalization, and category
-assignment.
+assignment. Sprint 5 adds the first authenticated backend review queue for
+stored SMS transaction candidates.
 
 ## Development Commands
 
@@ -129,6 +130,50 @@ The endpoint stores the raw SMS body for traceability, returns parser candidate 
 Known fake parser outputs are enriched with deterministic fake rules before
 storage. Unknown account or merchant values remain reviewable and are not
 guessed.
+
+## Review Queue Development Contract
+
+Review queue endpoints use the same development shared secret header as inbound
+SMS endpoints:
+
+```text
+X-Inbound-SMS-Secret: <INBOUND_SMS_SECRET>
+```
+
+List pending review items:
+
+```text
+GET /api/review-queue
+```
+
+List responses include parsed/enriched candidate fields and explainability
+metadata, but do not include raw SMS bodies.
+
+Inspect one review item:
+
+```text
+GET /api/review-queue/{raw_sms_id}
+```
+
+Detail responses include the stored raw SMS body for explicit review.
+
+Mark a review item as reviewed:
+
+```text
+POST /api/review-queue/{raw_sms_id}/review
+```
+
+Payload:
+
+```json
+{
+  "decision": "reviewed",
+  "reason": "fake QA review"
+}
+```
+
+Sprint 5 stores review decision metadata on the parsed candidate output. Ledger
+promotion and correction flows are intentionally deferred.
 
 ## Selected Android Forwarder Pilot
 
