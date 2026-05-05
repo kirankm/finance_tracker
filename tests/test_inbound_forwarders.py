@@ -109,6 +109,9 @@ def test_selected_forwarder_maps_fake_payload_to_internal_ingestion_contract() -
         assert response_payload["raw_sms_id"].startswith("raw_sms_")
         assert response_payload["candidate"]["transaction_type"] == "debit"
         assert response_payload["candidate"]["amount"] == 480
+        assert response_payload["candidate"]["account_id"] == "acct_bank_1"
+        assert response_payload["candidate"]["merchant_canonical"] == "Merchant Food 1"
+        assert response_payload["candidate"]["category"] == "food_delivery"
 
         stored_messages = session.scalars(select(RawSmsMessage)).all()
 

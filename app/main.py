@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from app.config import get_settings
 from app.database import get_db_session
 from app.models import RawSmsMessage
+from app.rules import enrich_candidate
 from app.sms_parser import parse_sms
 
 settings = get_settings()
@@ -132,7 +133,7 @@ def persist_inbound_sms(
             candidate=existing_raw_sms.parser_output,
         )
 
-    candidate = parse_sms(payload.body)
+    candidate = enrich_candidate(parse_sms(payload.body))
     parser_output = candidate.model_dump(exclude_none=True)
     raw_sms = RawSmsMessage(
         id=f"raw_sms_{uuid4().hex}",

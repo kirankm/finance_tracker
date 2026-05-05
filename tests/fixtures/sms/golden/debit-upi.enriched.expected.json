@@ -1,0 +1,54 @@
+{
+  "transaction_type": "debit",
+  "purpose": "expense",
+  "amount": 480,
+  "account_clue": "BANK_1 a/c XX0000",
+  "merchant_raw": "MERCHANT_FOOD_1",
+  "transaction_date": "2026-05-04",
+  "available_balance": 50000,
+  "reference": "123456",
+  "source": "sms",
+  "review_status": "needs_review",
+  "confidence": {
+    "parsing": "high",
+    "account_mapping": "high",
+    "merchant_mapping": "high",
+    "category": "high"
+  },
+  "parser_metadata": {
+    "parser": "fake_upi_debit_v1",
+    "extracted_fields": [
+      "amount",
+      "account_clue",
+      "merchant_raw",
+      "date",
+      "available_balance",
+      "reference"
+    ]
+  },
+  "account_id": "acct_bank_1",
+  "merchant_canonical": "Merchant Food 1",
+  "category": "food_delivery",
+  "rule_metadata": {
+    "account_mapping": {
+      "rule_id": "account_bank_1_masked_0000_v1",
+      "matched_value": "BANK_1 a/c XX0000"
+    },
+    "merchant_mapping": {
+      "rule_id": "merchant_food_1_v1",
+      "matched_value": "MERCHANT_FOOD_1"
+    },
+    "category": {
+      "rule_id": "merchant_food_1_v1",
+      "source": "merchant_default_category"
+    },
+    "transaction_type": {
+      "reason": "preserved_parser_value",
+      "value": "debit"
+    },
+    "purpose": {
+      "reason": "preserved_parser_value",
+      "value": "expense"
+    }
+  }
+}

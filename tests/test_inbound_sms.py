@@ -91,6 +91,9 @@ def test_inbound_sms_accepts_valid_fake_payload_and_stores_raw_sms() -> None:
         assert response_payload["raw_sms_id"].startswith("raw_sms_")
         assert response_payload["candidate"]["transaction_type"] == "debit"
         assert response_payload["candidate"]["amount"] == 480
+        assert response_payload["candidate"]["account_id"] == "acct_bank_1"
+        assert response_payload["candidate"]["merchant_canonical"] == "Merchant Food 1"
+        assert response_payload["candidate"]["category"] == "food_delivery"
         assert response_payload["candidate"]["review_status"] == "needs_review"
         assert "body" not in response_payload
 
@@ -102,6 +105,10 @@ def test_inbound_sms_accepts_valid_fake_payload_and_stores_raw_sms() -> None:
     assert stored_messages[0].body == valid_payload()["body"]
     assert stored_messages[0].parser_output["transaction_type"] == "debit"
     assert stored_messages[0].parser_output["parser_metadata"]["parser"] == "fake_upi_debit_v1"
+    assert stored_messages[0].parser_output["rule_metadata"]["merchant_mapping"] == {
+        "rule_id": "merchant_food_1_v1",
+        "matched_value": "MERCHANT_FOOD_1",
+    }
 
 
 def test_inbound_sms_duplicate_message_id_is_idempotent() -> None:

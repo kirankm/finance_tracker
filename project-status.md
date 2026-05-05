@@ -2,11 +2,11 @@
 
 ## Current Sprint
 
-Sprint 3: SMS Forwarder Integration
+Sprint 4: Rules and Categorization
 
 ## Sprint Status
 
-done
+review
 
 Allowed values:
 - planning
@@ -21,7 +21,7 @@ Sprint 3: SMS Forwarder Integration
 
 ## Current Focus
 
-Plan Sprint 4 rules and categorization.
+Review Sprint 4 deterministic rules and categorization.
 
 ## Current Branch
 
