@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.duplicate_detection import DuplicateDecision, detect_duplicate_candidate
 from app.models import Account, AuditEvent, LedgerTransaction, RawSmsMessage
 from app.review_queue import get_raw_sms_or_404
 
@@ -22,6 +23,8 @@ class LedgerPromotionResponse(BaseModel):
     status: Literal["promoted", "already_promoted"]
     ledger_transaction_id: str
     raw_sms_id: str
+    duplicate_status: str
+    ledger_status: str
 
 
 def promote_reviewed_sms_candidate(
@@ -39,6 +42,8 @@ def promote_reviewed_sms_candidate(
                 status="already_promoted",
                 ledger_transaction_id=existing_transaction.id,
                 raw_sms_id=raw_sms.id,
+                duplicate_status=existing_transaction.duplicate_status,
+                ledger_status=existing_transaction.ledger_status,
             ),
             status.HTTP_200_OK,
         )
@@ -47,6 +52,7 @@ def promote_reviewed_sms_candidate(
     validate_candidate_ready_for_promotion(candidate)
     account_id = str(candidate["account_id"])
     ensure_known_account(db_session, account_id)
+    duplicate_decision = detect_duplicate_candidate(db_session, candidate)
 
     transaction = LedgerTransaction(
         id=f"txn_{uuid4().hex}",
@@ -64,9 +70,9 @@ def promote_reviewed_sms_candidate(
         merchant_mapping_confidence=candidate.get("confidence", {}).get("merchant_mapping"),
         category_confidence=candidate.get("confidence", {}).get("category"),
         review_status="reviewed",
-        duplicate_status=str(candidate.get("duplicate_status", "unique")),
-        ledger_status=str(candidate.get("ledger_status", "included")),
-        source_metadata=build_source_metadata(raw_sms, candidate),
+        duplicate_status=duplicate_decision.status,
+        ledger_status=duplicate_decision.ledger_status,
+        source_metadata=build_source_metadata(raw_sms, candidate, duplicate_decision),
     )
     db_session.add(transaction)
     db_session.flush()
@@ -81,12 +87,17 @@ def promote_reviewed_sms_candidate(
             "external_message_id": raw_sms.external_message_id,
             "transaction_id": transaction.id,
             "source": raw_sms.source,
+            "duplicate_status": transaction.duplicate_status,
+            "ledger_status": transaction.ledger_status,
         },
         reason=payload.reason,
     )
     db_session.add(audit_event)
 
     parser_output = dict(raw_sms.parser_output)
+    parser_output["duplicate_detection"] = duplicate_decision.as_metadata()
+    parser_output["duplicate_status"] = duplicate_decision.status
+    parser_output["ledger_status"] = duplicate_decision.ledger_status
     parser_output["promotion_metadata"] = {
         "ledger_transaction_id": transaction.id,
         "promoted_at": datetime.now(UTC).isoformat(),
@@ -102,6 +113,8 @@ def promote_reviewed_sms_candidate(
             status="promoted",
             ledger_transaction_id=transaction.id,
             raw_sms_id=raw_sms.id,
+            duplicate_status=transaction.duplicate_status,
+            ledger_status=transaction.ledger_status,
         ),
         status.HTTP_201_CREATED,
     )
@@ -203,7 +216,9 @@ def parse_transaction_date(value: object) -> date:
 
 
 def build_source_metadata(
-    raw_sms: RawSmsMessage, candidate: dict[str, Any]
+    raw_sms: RawSmsMessage,
+    candidate: dict[str, Any],
+    duplicate_decision: DuplicateDecision,
 ) -> dict[str, Any]:
     return {
         "raw_sms_id": raw_sms.id,
@@ -214,6 +229,7 @@ def build_source_metadata(
         "review_metadata": candidate.get("review_metadata", {}),
         "reference": candidate.get("reference"),
         "available_balance": candidate.get("available_balance"),
+        "duplicate_detection": duplicate_decision.as_metadata(),
     }
 
 

@@ -19,12 +19,12 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 6 ledger promotion is merged to `main`. The app has authenticated SMS
+Sprint 7 duplicate detection is in progress. The app has authenticated SMS
 ingestion, the selected Android forwarder adapter, deterministic fake-rule
 enrichment for account mapping, merchant normalization, and category assignment,
 an authenticated backend review queue for stored SMS transaction candidates, and
 an authenticated path for promoting reviewed fake candidates into ledger
-transactions.
+transactions with deterministic duplicate detection.
 
 ## Development Commands
 
@@ -211,14 +211,33 @@ returns `201`:
 ```
 
 Replaying promotion for the same raw SMS returns the existing transaction with
-`200` and `status: "already_promoted"`. Unreviewed candidates return `409`.
+`200` and `status: "already_promoted"`. Promotion responses include
+`duplicate_status` and `ledger_status`. Unreviewed candidates return `409`.
 Candidates missing required ledger fields return `422`. Missing raw SMS ids
 return `404`.
 
 Sprint 6 links promoted ledger transactions to `RawSmsMessage` through
 `raw_sms_message_id` and stores source metadata for parser, rule, review,
-reference, and available-balance context. Duplicate detection across different
-SMS messages and ledger balance mismatch checks are intentionally deferred.
+reference, and available-balance context. Sprint 7 adds cross-message duplicate
+detection during promotion. Ledger balance mismatch checks are intentionally
+deferred.
+
+## Duplicate Detection Development Contract
+
+Sprint 7 detects duplicates during ledger promotion against already-promoted
+SMS-derived ledger transactions.
+
+Status behavior:
+
+| Match | `duplicate_status` | `ledger_status` |
+|---|---|---|
+| No duplicate match | `unique` | `included` |
+| Same account, reference, amount, date, and transaction type | `exact_duplicate` | `excluded` |
+| Same account, amount, date, transaction type, and canonical merchant | `possible_duplicate` | `excluded` |
+
+Duplicate decisions are stored in ledger `source_metadata.duplicate_detection`
+and raw SMS `parser_output.duplicate_detection`. Duplicate promotions are kept
+for traceability and audit history; they are not deleted or silently dropped.
 
 ## Selected Android Forwarder Pilot
 
