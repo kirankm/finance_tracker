@@ -19,7 +19,7 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 0 implementation in progress.
+Sprint 0 implementation is in review.
 
 ## Development Commands
 
@@ -67,6 +67,16 @@ docker compose up --build
 ```
 
 The app listens on `http://localhost:8000`.
+
+Run the Linode-style production stack with Caddy:
+
+```bash
+cp .env.example .env
+# edit .env before starting production
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+```
+
+See `docs/deployment/linode.md` before accepting real SMS payloads.
 
 On Debian/Ubuntu hosts, install `python3.12-venv` and `python3-pip` if `python3 -m venv .venv` or `python3 -m pip` is unavailable.
 

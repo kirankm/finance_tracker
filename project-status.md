@@ -32,7 +32,7 @@ Set up the project foundation: repo structure, Codex workflow, TDD, CI, Docker, 
 - SMS forwarding service not selected.
 - Exact inbound SMS payload contract not finalized.
 - Host Python local checks need `python3.12-venv` and `python3-pip`; Docker checks pass.
-- Linode production deployment needs HTTPS, firewall, secret handling, and backup path before real SMS data.
+- Linode production deployment has a Caddy HTTPS path documented; firewall, secret handling, and backup path still need server verification before real SMS data.
 
 ## Notes
 

@@ -17,6 +17,7 @@ Create the foundation for reliable Codex-driven development before product featu
 - Add fake fixture strategy.
 - Document V1 SMS ingestion direction: external forwarding service / inbound SMS pipeline, not native Android app.
 - Document Linode VPS deployment assumptions.
+- Add Caddy reverse proxy path for Linode HTTPS.
 - Add initial docs: backlog, risk register, decisions.
 
 ## Out of Scope
@@ -59,6 +60,7 @@ app/main.py
 app/templates/
 docker-compose.yml
 docs/decisions/0004-use-python-fastapi-sqlite-for-sprint-0.md
+docs/decisions/0005-use-caddy-for-linode-https.md
 docs/deployment/linode.md
 migrations/
 pyproject.toml
@@ -100,7 +102,7 @@ tests/test_config.py
 - SMS forwarding mechanism is not selected.
 - Exact inbound SMS payload contract is not finalized.
 - Linode is the target deployment environment.
-- Production HTTPS/reverse proxy path is not configured yet.
+- Production HTTPS/reverse proxy path uses Caddy, but needs DNS/firewall verification on the Linode server.
 - Production backup/restore path is not configured yet.
 - SQLite may need to be replaced by PostgreSQL if deployment, concurrency, or backup needs outgrow it.
 
@@ -117,6 +119,8 @@ docker compose build
 docker compose run --rm app python -m pytest
 docker compose run --rm app python -m ruff check .
 docker compose run --rm app python -m mypy
+docker compose -f docker-compose.yml -f docker-compose.prod.yml config
+docker run --rm -e CADDY_DOMAIN=finance.example.com -v /home/kiran/projects/finance_tracker/Caddyfile:/etc/caddy/Caddyfile:ro caddy:2-alpine caddy validate --config /etc/caddy/Caddyfile
 docker compose up
 curl -sS http://localhost:8000/health
 curl -sS http://localhost:8000/
@@ -128,6 +132,8 @@ Results:
 - Tests passed: 4 passed.
 - Ruff passed.
 - Mypy passed.
+- Production Compose config rendered successfully with no public `8000` app port.
+- Caddyfile validation passed.
 - Docker startup passed.
 - `/health` returned `{"status":"ok"}`.
 - `/` rendered the foundation page.
@@ -135,3 +141,5 @@ Results:
 Host-only Python checks were not run because the host is missing `python3.12-venv` and `python3-pip`. README documents the required packages.
 
 Linode VPS was identified as the target deployment environment during review. Added deployment notes for Docker Compose, HTTPS, firewalling, secrets, and backups.
+
+Caddy was selected for the initial Linode HTTPS reverse proxy path during review. Added `docker-compose.prod.yml`, `Caddyfile`, and a deployment decision record.

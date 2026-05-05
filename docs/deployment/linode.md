@@ -1,12 +1,13 @@
 # Linode Deployment Notes
 
-Sprint 0 targets a single Linode VPS running Docker Compose.
+Sprint 0 targets a single Linode VPS running Docker Compose with Caddy as the public HTTPS reverse proxy.
 
 ## Assumptions
 
 - The app runs behind HTTPS before any real SMS payloads are accepted.
 - The server uses a real `.env` file that is not committed.
 - `INBOUND_SMS_SECRET` is strong and unique to the deployment.
+- `CADDY_DOMAIN` is a real domain or subdomain pointed at the Linode public IP.
 - Raw SMS payloads are not logged.
 - SQLite is acceptable for early single-user deployment only if backups are configured before real data is stored.
 
@@ -14,7 +15,7 @@ Sprint 0 targets a single Linode VPS running Docker Compose.
 
 - Docker and Docker Compose plugin installed.
 - Firewall allows only SSH, HTTP, and HTTPS from the internet.
-- App port `8000` is not exposed directly to the public internet once a reverse proxy is configured.
+- App port `8000` is not exposed directly to the public internet in production.
 - A domain or subdomain points to the Linode public IP.
 
 ## Initial Run
@@ -29,9 +30,10 @@ Edit `.env` on the server:
 ENVIRONMENT=production
 INBOUND_SMS_SECRET=<strong-random-secret>
 DATABASE_URL=sqlite:///./data/finance_tracker.db
+CADDY_DOMAIN=<your-domain.example>
 ```
 
-Build and run:
+Use the local Compose file for a plain health check on the server:
 
 ```bash
 docker compose up --build -d
@@ -39,9 +41,33 @@ docker compose ps
 curl http://localhost:8000/health
 ```
 
+Stop the local check before starting the production proxy:
+
+```bash
+docker compose down
+```
+
+## Production HTTPS Run
+
+Confirm DNS points to the Linode IP:
+
+```bash
+dig +short <your-domain.example>
+```
+
+Start the production stack:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
+docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
+curl https://<your-domain.example>/health
+```
+
+Caddy listens on ports `80` and `443`, obtains certificates automatically, and proxies traffic to the app over the internal Docker network. The production override removes the public `8000` port mapping from the app service.
+
 ## Before Real SMS Ingestion
 
-- Configure HTTPS with a reverse proxy such as Caddy, Nginx, or Traefik.
+- Confirm Caddy can issue and renew HTTPS certificates for `CADDY_DOMAIN`.
 - Confirm the external SMS forwarding service can send HTTPS requests.
 - Add authenticated ingestion contract tests.
 - Confirm production logs do not include full raw SMS content.
