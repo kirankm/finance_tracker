@@ -1,0 +1,12 @@
+{
+  "transaction_type": "debit",
+  "purpose": "expense",
+  "amount": 480,
+  "account_clue": "BANK_1 a/c XX0000",
+  "merchant_raw": "MERCHANT_FOOD_1",
+  "date": "2026-05-04",
+  "available_balance": 50000,
+  "reference": "123456",
+  "source": "sms",
+  "review_status": "needs_review"
+}
