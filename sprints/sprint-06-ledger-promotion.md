@@ -129,3 +129,4 @@ Implementation continued after approval on 2026-05-05.
 - Recorded Decision 0011 for durable raw SMS linkage and temporary fake account creation.
 - Added a risk-register entry for cross-message duplicates remaining unresolved until Sprint 7.
 - Local HTTP QA verified fake ingest, review, promote, replay idempotency, source metadata, audit event creation, unreviewed rejection, unknown-account rejection, and shared-secret rejection.
+- GitHub Actions passed on PR #5, and the PR was squash-merged to `main`.

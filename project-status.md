@@ -6,7 +6,7 @@ Sprint 6: Ledger Promotion
 
 ## Sprint Status
 
-review
+done
 
 Allowed values:
 - planning
@@ -17,11 +17,11 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 5: Review Queue
+Sprint 6: Ledger Promotion
 
 ## Current Focus
 
-Open Sprint 6 PR and wait for CI.
+Plan Sprint 7 duplicate detection.
 
 ## Current Branch
 
@@ -41,3 +41,5 @@ Keep this file short. Detailed history belongs in sprint docs and decision recor
 GitHub remote is configured, `main` is the default branch, and GitHub Actions passed on the Sprint 5 PR.
 
 V1 roadmap through the V2 planning boundary is drafted in `docs/roadmap-2026-05-05.md`.
+
+Sprint 6 PR checks passed and the PR was merged to `main`.

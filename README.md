@@ -19,7 +19,7 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 6 ledger promotion is in progress. The app has authenticated SMS
+Sprint 6 ledger promotion is merged to `main`. The app has authenticated SMS
 ingestion, the selected Android forwarder adapter, deterministic fake-rule
 enrichment for account mapping, merchant normalization, and category assignment,
 an authenticated backend review queue for stored SMS transaction candidates, and
