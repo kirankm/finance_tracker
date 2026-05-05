@@ -85,4 +85,4 @@ Implementation continued after review approval on 2026-05-05.
 - `docker compose run --rm app python -m ruff check .` passed.
 - `docker compose run --rm app python -m mypy` passed with no issues in 10 source files.
 - Production Compose config validation passed, and `ss -ltnp` showed no public listener on port `8000`.
-- Remote CI was not observed because no git remote is configured on this server.
+- Remote CI initially failed during dependency installation because setuptools auto-discovered non-package top-level directories. Fixed by explicitly packaging only `app`.
