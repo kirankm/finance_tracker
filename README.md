@@ -19,11 +19,10 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 4 rules and categorization is merged to `main`. The app has authenticated
-SMS ingestion, the selected Android forwarder adapter, and deterministic
-fake-rule enrichment for account mapping, merchant normalization, and category
-assignment. Sprint 5 adds the first authenticated backend review queue for
-stored SMS transaction candidates.
+Sprint 5 review queue is merged to `main`. The app has authenticated SMS
+ingestion, the selected Android forwarder adapter, deterministic fake-rule
+enrichment for account mapping, merchant normalization, and category assignment,
+and an authenticated backend review queue for stored SMS transaction candidates.
 
 ## Development Commands
 

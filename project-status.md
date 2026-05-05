@@ -6,7 +6,7 @@ Sprint 5: Review Queue
 
 ## Sprint Status
 
-review
+done
 
 Allowed values:
 - planning
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 4: Rules and Categorization
+Sprint 5: Review Queue
 
 ## Current Focus
 
-Review Sprint 5 implementation.
+Plan Sprint 6 ledger promotion.
 
 ## Current Branch
 
-`sprint-05-review-queue`
+`main`
 
 ## Open Blockers
 
@@ -38,4 +38,4 @@ Review Sprint 5 implementation.
 
 Keep this file short. Detailed history belongs in sprint docs and decision records.
 
-GitHub remote is configured, `main` is the default branch, and GitHub Actions passed on the Sprint 4 PR.
+GitHub remote is configured, `main` is the default branch, and GitHub Actions passed on the Sprint 5 PR.
