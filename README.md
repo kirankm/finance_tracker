@@ -98,3 +98,27 @@ On Debian/Ubuntu hosts, install `python3.12-venv` and `python3-pip` if `python3 
 
 Do not commit real SMS data, real bank messages, secrets, or personal financial data.
 Use fake or anonymized fixtures only.
+
+## Inbound SMS Development Contract
+
+Sprint 2 uses an internal JSON contract for fake SMS ingestion while the external forwarding service remains undecided.
+
+Endpoint:
+
+```text
+POST /api/inbound-sms
+X-Inbound-SMS-Secret: <INBOUND_SMS_SECRET>
+```
+
+Payload:
+
+```json
+{
+  "message_id": "fake-forwarder-msg-001",
+  "sender": "FAKEBANK",
+  "received_at": "2026-05-04T10:30:00Z",
+  "body": "Rs.480 debited from BANK_1 a/c XX0000 to MERCHANT_FOOD_1 on 04-May-2026. Avl Bal Rs.50000. Ref 123456."
+}
+```
+
+The endpoint stores the raw SMS body for traceability, returns parser candidate metadata for review, and must not log full raw SMS content.
