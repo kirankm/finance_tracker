@@ -1,0 +1,40 @@
+[project]
+name = "finance-tracker"
+version = "0.1.0"
+description = "Automated SMS-based personal expense tracker."
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.13.0",
+    "fastapi>=0.115.0",
+    "jinja2>=3.1.0",
+    "pydantic-settings>=2.6.0",
+    "sqlalchemy>=2.0.0",
+    "uvicorn[standard]>=0.32.0",
+]
+
+[build-system]
+requires = ["setuptools>=75.0"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+dev = [
+    "httpx>=0.27.0",
+    "mypy>=1.13.0",
+    "pytest>=8.3.0",
+    "ruff>=0.7.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["app", "tests"]

@@ -84,12 +84,14 @@ tests/test_config.py
 
 ## QA Checklist
 
-- Run local app startup command.
-- Run Docker startup command.
-- Run test command.
-- Confirm CI config exists.
-- Confirm `.env.example` exists.
-- Confirm no real SMS data is present.
+- [ ] Run host local app startup command.
+- [x] Run Docker startup command.
+- [x] Run test command.
+- [x] Run lint command.
+- [x] Run typecheck command.
+- [x] Confirm CI config exists.
+- [x] Confirm `.env.example` exists.
+- [x] Confirm no real SMS data is present.
 
 ## Risks / Open Questions
 
@@ -100,4 +102,30 @@ tests/test_config.py
 
 ## Completion Notes
 
-Planning updated with a proposed concrete Sprint 0 stack on 2026-05-05. Implementation should start after review.
+Planning updated with a proposed concrete Sprint 0 stack on 2026-05-05.
+
+Implementation completed and moved to review on 2026-05-05.
+
+Checks run:
+
+```text
+docker compose build
+docker compose run --rm app python -m pytest
+docker compose run --rm app python -m ruff check .
+docker compose run --rm app python -m mypy
+docker compose up
+curl -sS http://localhost:8000/health
+curl -sS http://localhost:8000/
+```
+
+Results:
+
+- Docker image built successfully.
+- Tests passed: 4 passed.
+- Ruff passed.
+- Mypy passed.
+- Docker startup passed.
+- `/health` returned `{"status":"ok"}`.
+- `/` rendered the foundation page.
+
+Host-only Python checks were not run because the host is missing `python3.12-venv` and `python3-pip`. README documents the required packages.

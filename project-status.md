@@ -6,7 +6,7 @@
 
 ## Sprint Status
 
-planning
+review
 
 Allowed values:
 - planning
@@ -29,9 +29,9 @@ Set up the project foundation: repo structure, Codex workflow, TDD, CI, Docker, 
 
 ## Open Blockers
 
-- Tech stack not finalized.
 - SMS forwarding service not selected.
 - Exact inbound SMS payload contract not finalized.
+- Host Python local checks need `python3.12-venv` and `python3-pip`; Docker checks pass.
 
 ## Notes
 
