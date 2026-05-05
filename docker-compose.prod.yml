@@ -2,6 +2,7 @@ services:
   app:
     ports: !override []
     env_file: !override
+      - path: .env.example
       - path: .env
         required: false
     restart: unless-stopped
@@ -11,6 +12,7 @@ services:
     depends_on:
       - app
     env_file:
+      - path: .env.example
       - path: .env
         required: false
     ports:

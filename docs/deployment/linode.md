@@ -65,6 +65,18 @@ curl https://daily-expense.duckdns.org/health
 
 Caddy listens on ports `80` and `443`, obtains certificates automatically, and proxies traffic to the app over the internal Docker network. The production override removes the public `8000` port mapping from the app service.
 
+## Shared Server Run
+
+If another website already owns port `80`, keep that site running and publish only Caddy's HTTPS port for this app:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.shared-server.yml up --build -d
+docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.shared-server.yml ps
+curl https://daily-expense.duckdns.org/health
+```
+
+This allows `daily-expense.duckdns.org` to use HTTPS on port `443` while the existing port-`80` site remains unchanged. A future shared reverse proxy can route multiple domains through the same ports `80` and `443`.
+
 ## Before Real SMS Ingestion
 
 - Confirm Caddy can issue and renew HTTPS certificates for `CADDY_DOMAIN`.

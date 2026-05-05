@@ -62,6 +62,7 @@ docker-compose.yml
 docs/decisions/0004-use-python-fastapi-sqlite-for-sprint-0.md
 docs/decisions/0005-use-caddy-for-linode-https.md
 docs/deployment/linode.md
+docker-compose.shared-server.yml
 migrations/
 pyproject.toml
 tests/
@@ -103,6 +104,7 @@ tests/test_config.py
 - Exact inbound SMS payload contract is not finalized.
 - Linode is the target deployment environment.
 - Production HTTPS/reverse proxy path uses Caddy, but needs DNS/firewall verification on the Linode server.
+- Shared Linode server has another container using port `80`; finance tracker can run with Caddy bound to `443` only.
 - Production backup/restore path is not configured yet.
 - SQLite may need to be replaced by PostgreSQL if deployment, concurrency, or backup needs outgrow it.
 
@@ -145,3 +147,5 @@ Linode VPS was identified as the target deployment environment during review. Ad
 Caddy was selected for the initial Linode HTTPS reverse proxy path during review. Added `docker-compose.prod.yml`, `Caddyfile`, and a deployment decision record.
 
 Deployment domain set to `daily-expense.duckdns.org` during review.
+
+Added a shared-server Compose override for Linode hosts where another website already owns port `80`.
