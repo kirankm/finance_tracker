@@ -1,12 +1,14 @@
+from collections.abc import Awaitable, Callable
 from datetime import datetime
 from secrets import compare_digest
 from typing import Annotated
 from uuid import uuid4
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Request, status
+from fastapi import Depends, FastAPI, Request, Response, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -38,6 +40,30 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+def is_authorized_inbound_sms_request(request: Request) -> bool:
+    supplied_secret = request.headers.get("X-Inbound-SMS-Secret")
+    return supplied_secret is not None and compare_digest(
+        supplied_secret, settings.inbound_sms_secret
+    )
+
+
+@app.middleware("http")
+async def require_inbound_sms_secret(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    if request.url.path == "/api/inbound-sms" and not is_authorized_inbound_sms_request(
+        request
+    ):
+        return Response(
+            content='{"detail":"unauthorized"}',
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            media_type="application/json",
+        )
+
+    response = await call_next(request)
+    return response
+
+
 @app.post(
     "/api/inbound-sms",
     response_model=InboundSmsResponse,
@@ -45,13 +71,19 @@ def health() -> dict[str, str]:
 )
 def receive_inbound_sms(
     payload: InboundSmsPayload,
+    response: Response,
     db_session: Annotated[Session, Depends(get_db_session)],
-    x_inbound_sms_secret: Annotated[str | None, Header()] = None,
 ) -> InboundSmsResponse:
-    if x_inbound_sms_secret is None or not compare_digest(
-        x_inbound_sms_secret, settings.inbound_sms_secret
-    ):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="unauthorized")
+    existing_raw_sms = db_session.scalar(
+        select(RawSmsMessage).where(RawSmsMessage.external_message_id == payload.message_id)
+    )
+    if existing_raw_sms is not None:
+        response.status_code = status.HTTP_200_OK
+        return InboundSmsResponse(
+            raw_sms_id=existing_raw_sms.id,
+            processing_status=existing_raw_sms.processing_status,
+            candidate=existing_raw_sms.parser_output,
+        )
 
     candidate = parse_sms(payload.body)
     parser_output = candidate.model_dump(exclude_none=True)

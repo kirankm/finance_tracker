@@ -116,3 +116,6 @@ Implementation continued after review approval on 2026-05-05.
 - Public missing-secret inbound SMS QA returned 401.
 - Public malformed-payload inbound SMS QA returned 422.
 - Recent app logs showed request lines/statuses only, not full raw SMS content.
+- Review follow-up: moved inbound SMS auth ahead of request-body validation.
+- Review follow-up: made duplicate `message_id` delivery idempotent with a 200 response and no second row.
+- Review follow-up checks passed with 20 tests, lint, and mypy.
