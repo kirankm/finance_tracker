@@ -19,8 +19,9 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 2 SMS ingestion and parsing is merged to `main`. Sprint 3 is integrating the
-first selected Android SMS-to-webhook forwarding path on a sprint branch.
+Sprint 3 SMS forwarder integration is merged to `main`. The app has an
+authenticated internal inbound SMS endpoint and a selected Android forwarder
+adapter for fake-payload pilot testing.
 
 ## Development Commands
 

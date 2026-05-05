@@ -6,7 +6,7 @@ Sprint 3: SMS Forwarder Integration
 
 ## Sprint Status
 
-review
+done
 
 Allowed values:
 - planning
@@ -17,20 +17,20 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 2: SMS Ingestion and Parsing
+Sprint 3: SMS Forwarder Integration
 
 ## Current Focus
 
-Review Sprint 3 selected forwarder adapter after Docker checks, fake HTTPS QA, and review hardening fixes.
+Plan Sprint 4 rules and categorization.
 
 ## Current Branch
 
-`sprint-03-sms-forwarder-integration`
+`main`
 
 ## Open Blockers
 
-- SMS forwarding service not finalized; Sprint 3 proposes `bogkonstantin/android_income_sms_gateway_webhook` as the first pilot candidate.
-- Exact external SMS forwarding payload contract not finalized.
+- Selected Android forwarder still needs fake-device setup validation before real SMS ingestion.
+- Selected Android forwarder header support for `X-Inbound-SMS-Secret` still needs validation on device.
 - Host Python local checks need `python3.12-venv` and `python3-pip`; Docker checks pass.
 - Backups are documented and smoke-tested locally; off-server backup storage still needs to be chosen before relying on real data.
 
@@ -38,4 +38,4 @@ Review Sprint 3 selected forwarder adapter after Docker checks, fake HTTPS QA, a
 
 Keep this file short. Detailed history belongs in sprint docs and decision records.
 
-GitHub remote is configured, `main` is the default branch, and GitHub Actions passed on the Sprint 2 merge commit.
+GitHub remote is configured, `main` is the default branch, and GitHub Actions passed on the Sprint 3 PR.
