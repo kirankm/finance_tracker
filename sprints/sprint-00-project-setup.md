@@ -16,6 +16,7 @@ Create the foundation for reliable Codex-driven development before product featu
 - Add environment variable handling.
 - Add fake fixture strategy.
 - Document V1 SMS ingestion direction: external forwarding service / inbound SMS pipeline, not native Android app.
+- Document Linode VPS deployment assumptions.
 - Add initial docs: backlog, risk register, decisions.
 
 ## Out of Scope
@@ -58,6 +59,7 @@ app/main.py
 app/templates/
 docker-compose.yml
 docs/decisions/0004-use-python-fastapi-sqlite-for-sprint-0.md
+docs/deployment/linode.md
 migrations/
 pyproject.toml
 tests/
@@ -97,7 +99,9 @@ tests/test_config.py
 
 - SMS forwarding mechanism is not selected.
 - Exact inbound SMS payload contract is not finalized.
-- Staging deployment approach is not selected.
+- Linode is the target deployment environment.
+- Production HTTPS/reverse proxy path is not configured yet.
+- Production backup/restore path is not configured yet.
 - SQLite may need to be replaced by PostgreSQL if deployment, concurrency, or backup needs outgrow it.
 
 ## Completion Notes
@@ -129,3 +133,5 @@ Results:
 - `/` rendered the foundation page.
 
 Host-only Python checks were not run because the host is missing `python3.12-venv` and `python3-pip`. README documents the required packages.
+
+Linode VPS was identified as the target deployment environment during review. Added deployment notes for Docker Compose, HTTPS, firewalling, secrets, and backups.
