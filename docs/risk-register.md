@@ -7,6 +7,7 @@
 | Duplicate detection false positives | Real transactions may be excluded | Possible duplicates require review | Open |
 | Raw SMS leakage in logs | Privacy issue | Logging rules, fake fixtures, review sensitive logs | Open |
 | Ledger mismatch logic is wrong | User loses trust in balances | TDD with ledger fixtures and explainability metadata | Open |
+| Deterministic categorization rules are wrong or too broad | Transactions may be assigned to the wrong category or merchant | Keep Sprint 4 rules narrow, fake-fixture based, explainable, and reviewable; add golden fixtures for each new rule | Open |
 | External SMS forwarding service changes payload format | Ingestion may break | Validate payloads and add contract tests | Open |
 | Selected Android forwarder cannot send the shared secret as a header | Real SMS forwarding cannot be authenticated with the current endpoint contract | Verify header support during fake-device setup; if unavailable, add a narrowly scoped tokenized endpoint or switch to SMSGate | Open |
 | Android background restrictions stop SMS forwarding | Transactions may be delayed or missed | Document required permissions, battery optimization settings, and fake end-to-end test steps before real ingestion | Open |

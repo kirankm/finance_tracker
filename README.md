@@ -19,9 +19,9 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 3 SMS forwarder integration is merged to `main`. The app has an
-authenticated internal inbound SMS endpoint and a selected Android forwarder
-adapter for fake-payload pilot testing.
+Sprint 4 is in review on the sprint branch. The app has authenticated SMS
+ingestion, the selected Android forwarder adapter, and deterministic fake-rule
+enrichment for account mapping, merchant normalization, and category assignment.
 
 ## Development Commands
 
@@ -124,6 +124,10 @@ Payload:
 ```
 
 The endpoint stores the raw SMS body for traceability, returns parser candidate metadata for review, and must not log full raw SMS content.
+
+Known fake parser outputs are enriched with deterministic fake rules before
+storage. Unknown account or merchant values remain reviewable and are not
+guessed.
 
 ## Selected Android Forwarder Pilot
 
