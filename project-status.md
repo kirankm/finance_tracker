@@ -2,11 +2,11 @@
 
 ## Current Sprint
 
-Sprint 6: Ledger Promotion
+Sprint 7: Duplicate Detection
 
 ## Sprint Status
 
-done
+review
 
 Allowed values:
 - planning
@@ -21,11 +21,11 @@ Sprint 6: Ledger Promotion
 
 ## Current Focus
 
-Plan Sprint 7 duplicate detection.
+Open Sprint 7 PR and wait for CI.
 
 ## Current Branch
 
-`sprint-06-ledger-promotion`
+`sprint-07-duplicate-detection`
 
 ## Open Blockers
 
@@ -43,3 +43,6 @@ GitHub remote is configured, `main` is the default branch, and GitHub Actions pa
 V1 roadmap through the V2 planning boundary is drafted in `docs/roadmap-2026-05-05.md`.
 
 Sprint 6 PR checks passed and the PR was merged to `main`.
+
+Sprint 7 duplicate detection implementation and local QA are complete on
+`sprint-07-duplicate-detection`; CI review is next.
