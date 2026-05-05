@@ -6,7 +6,7 @@ Sprint 2: SMS Ingestion and Parsing
 
 ## Sprint Status
 
-review
+done
 
 Allowed values:
 - planning
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 1: Core Ledger Foundation
+Sprint 2: SMS Ingestion and Parsing
 
 ## Current Focus
 
-Review Sprint 2 ingestion and parser implementation after completed manual QA.
+Select and plan the next sprint after Sprint 2 merge.
 
 ## Current Branch
 
-`sprint-02-sms-ingestion-parsing`
+`main`
 
 ## Open Blockers
 
@@ -38,4 +38,4 @@ Review Sprint 2 ingestion and parser implementation after completed manual QA.
 
 Keep this file short. Detailed history belongs in sprint docs and decision records.
 
-GitHub remote is configured, `main` is the default branch, and GitHub Actions passed on the Sprint 1 merge commit.
+GitHub remote is configured, `main` is the default branch, and GitHub Actions passed on the Sprint 2 merge commit.
