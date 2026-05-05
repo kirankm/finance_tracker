@@ -2,11 +2,11 @@
 
 ## Current Sprint
 
-None. Sprint 2 has not been planned yet.
+Sprint 2: SMS Ingestion and Parsing
 
 ## Sprint Status
 
-done
+review
 
 Allowed values:
 - planning
@@ -21,16 +21,16 @@ Sprint 1: Core Ledger Foundation
 
 ## Current Focus
 
-Ready to plan Sprint 2.
+Review Sprint 2 ingestion and parser implementation after completed manual QA.
 
 ## Current Branch
 
-`main`
+`sprint-02-sms-ingestion-parsing`
 
 ## Open Blockers
 
 - SMS forwarding service not selected.
-- Exact inbound SMS payload contract not finalized.
+- Exact external SMS forwarding payload contract not finalized.
 - Host Python local checks need `python3.12-venv` and `python3-pip`; Docker checks pass.
 - Backups are documented and smoke-tested locally; off-server backup storage still needs to be chosen before relying on real data.
 

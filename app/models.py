@@ -8,7 +8,7 @@ from sqlalchemy.types import TypeDecorator
 
 from app.database import Base
 
-__all__ = ["Account", "AuditEvent", "Base", "LedgerTransaction"]
+__all__ = ["Account", "AuditEvent", "Base", "LedgerTransaction", "RawSmsMessage"]
 
 
 class UTCDateTime(TypeDecorator[datetime]):
@@ -91,6 +91,19 @@ class LedgerTransaction(Base, TimestampMixin, SoftDeleteMixin):
     audit_events: Mapped[list["AuditEvent"]] = relationship(
         back_populates="transaction", cascade="save-update, merge"
     )
+
+
+class RawSmsMessage(Base, TimestampMixin):
+    __tablename__ = "raw_sms_messages"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    external_message_id: Mapped[str] = mapped_column(String(160), nullable=False, unique=True)
+    sender: Mapped[str] = mapped_column(String(80), nullable=False)
+    received_at: Mapped[datetime] = mapped_column(UTCDateTime(), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    source: Mapped[str] = mapped_column(String(40), nullable=False)
+    processing_status: Mapped[str] = mapped_column(String(40), nullable=False)
+    parser_output: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
 
 
 class AuditEvent(Base, TimestampMixin):

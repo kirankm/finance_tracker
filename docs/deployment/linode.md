@@ -18,6 +18,41 @@ Sprint 0 targets a single Linode VPS running Docker Compose with Caddy as the pu
 - App port `8000` is not exposed directly to the public internet in production.
 - A domain or subdomain points to the Linode public IP.
 
+## Codex Sandbox Prerequisite
+
+On Ubuntu hosts, Codex shell commands may fail before execution with:
+
+```text
+bwrap: loopback: Failed RTM_NEWADDR: Operation not permitted
+```
+
+If normal read-only commands such as `git status` or `sed` fail with that message, check Ubuntu's AppArmor user namespace restriction:
+
+```bash
+sysctl kernel.apparmor_restrict_unprivileged_userns
+```
+
+Codex's bubblewrap-based sandbox needs unprivileged user namespaces. On this Linode, the fix was:
+
+```bash
+sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+```
+
+To make the setting survive reboot:
+
+```bash
+printf 'kernel.apparmor_restrict_unprivileged_userns=0\n' | sudo tee /etc/sysctl.d/99-codex-bwrap.conf
+sudo sysctl --system
+```
+
+After changing it, verify normal sandboxed commands work without escalation:
+
+```bash
+git status --short --branch
+```
+
+This relaxes a host-level AppArmor hardening setting. Keep the server otherwise locked down with firewall rules, SSH hygiene, no committed secrets, and Docker services exposing only the intended public ports.
+
 ## Initial Run
 
 ```bash
