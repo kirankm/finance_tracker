@@ -84,7 +84,7 @@ docker compose run --rm app python -m pytest
 - [x] Manually POST a payload with a missing/invalid secret and verify it is rejected.
 - [x] Manually POST a malformed payload and verify it is rejected without persistence.
 - [x] Verify logs do not include full raw SMS text.
-- [ ] Verify all SMS fixtures are fake or anonymized.
+- [x] Verify all SMS fixtures are fake or anonymized.
 
 ## Risks / Open Questions
 
@@ -119,3 +119,4 @@ Implementation continued after review approval on 2026-05-05.
 - Review follow-up: moved inbound SMS auth ahead of request-body validation.
 - Review follow-up: made duplicate `message_id` delivery idempotent with a 200 response and no second row.
 - Review follow-up checks passed with 20 tests, lint, and mypy.
+- Verified golden SMS fixtures use fake/anonymized placeholder bank, account, merchant, and reference values.
