@@ -11,7 +11,9 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./data/finance_tracker.db"
     inbound_sms_secret: str = Field(default="change-me-in-development", min_length=1)
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
 
     @field_validator("inbound_sms_secret")
     @classmethod

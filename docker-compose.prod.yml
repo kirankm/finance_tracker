@@ -11,10 +11,8 @@ services:
     image: caddy:2-alpine
     depends_on:
       - app
-    env_file:
-      - path: .env.example
-      - path: .env
-        required: false
+    environment:
+      CADDY_DOMAIN: ${CADDY_DOMAIN}
     ports:
       - "80:80"
       - "443:443"

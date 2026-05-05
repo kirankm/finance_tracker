@@ -83,7 +83,7 @@ This allows `daily-expense.duckdns.org` to use HTTPS on port `443` while the exi
 - Confirm the external SMS forwarding service can send HTTPS requests.
 - Add authenticated ingestion contract tests.
 - Confirm production logs do not include full raw SMS content.
-- Configure SQLite backup and restore commands, or move to PostgreSQL.
+- Run and verify the SQLite backup/restore path in `docs/deployment/backup-restore.md`, or move to PostgreSQL.
 
 ## Backup Requirement
 

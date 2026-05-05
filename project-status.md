@@ -2,11 +2,11 @@
 
 ## Current Sprint
 
-`sprints/sprint-00-project-setup.md`
+`sprints/sprint-01-core-ledger-foundation.md`
 
 ## Sprint Status
 
-review
+planning
 
 Allowed values:
 - planning
@@ -17,22 +17,23 @@ Allowed values:
 
 ## Last Completed Sprint
 
-None
+Sprint 0: Project Setup
 
 ## Current Focus
 
-Set up the project foundation: repo structure, Codex workflow, TDD, CI, Docker, privacy/security foundations, and initial documentation.
+Plan the core ledger foundation: transaction, account, and audit model.
 
 ## Current Branch
 
-`sprint-00-project-setup`
+`sprint-01-core-ledger-foundation`
 
 ## Open Blockers
 
 - SMS forwarding service not selected.
 - Exact inbound SMS payload contract not finalized.
 - Host Python local checks need `python3.12-venv` and `python3-pip`; Docker checks pass.
-- Linode production deployment has a Caddy HTTPS path documented; firewall, secret handling, and backup path still need server verification before real SMS data.
+- No git remote is configured, so remote CI has not been observed from this server.
+- Backups are documented and smoke-tested locally; off-server backup storage still needs to be chosen before relying on real data.
 
 ## Notes
 

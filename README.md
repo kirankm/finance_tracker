@@ -77,6 +77,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 ```
 
 See `docs/deployment/linode.md` before accepting real SMS payloads.
+See `docs/deployment/backup-restore.md` for the SQLite backup and restore path.
 
 On Debian/Ubuntu hosts, install `python3.12-venv` and `python3-pip` if `python3 -m venv .venv` or `python3 -m pip` is unavailable.
 

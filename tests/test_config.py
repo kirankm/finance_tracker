@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Any
+
 import pytest
 from pydantic import ValidationError
 
@@ -15,3 +18,13 @@ def test_settings_load_default_development_values() -> None:
 def test_inbound_sms_secret_cannot_be_blank() -> None:
     with pytest.raises(ValidationError):
         Settings(inbound_sms_secret="   ")
+
+
+def test_settings_ignore_unrelated_deployment_dotenv_values(tmp_path: Path) -> None:
+    dotenv_path = tmp_path / ".env"
+    dotenv_path.write_text("CADDY_DOMAIN=daily-expense.duckdns.org\n", encoding="utf-8")
+
+    settings_kwargs: dict[str, Any] = {"_env_file": dotenv_path}
+    settings = Settings(**settings_kwargs)
+
+    assert settings.environment == "development"

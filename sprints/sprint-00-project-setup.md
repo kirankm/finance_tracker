@@ -49,6 +49,7 @@ Expected files:
 
 ```text
 .env.example
+.dockerignore
 .github/workflows/ci.yml
 Dockerfile
 README.md
@@ -57,10 +58,12 @@ app/
 app/__init__.py
 app/config.py
 app/main.py
+app/sqlite_backup.py
 app/templates/
 docker-compose.yml
 docs/decisions/0004-use-python-fastapi-sqlite-for-sprint-0.md
 docs/decisions/0005-use-caddy-for-linode-https.md
+docs/deployment/backup-restore.md
 docs/deployment/linode.md
 docker-compose.shared-server.yml
 migrations/
@@ -97,6 +100,11 @@ tests/test_config.py
 - [x] Confirm CI config exists.
 - [x] Confirm `.env.example` exists.
 - [x] Confirm no real SMS data is present.
+- [x] Confirm production `.env` exists on Linode and is not committed.
+- [x] Confirm Docker image does not contain `.env` or `.venv`.
+- [x] Confirm production HTTPS health check works on Linode.
+- [x] Confirm app port `8000` is not listening publicly on Linode.
+- [x] Run SQLite backup/restore smoke test with fake data.
 
 ## Risks / Open Questions
 
@@ -105,7 +113,7 @@ tests/test_config.py
 - Linode is the target deployment environment.
 - Production HTTPS/reverse proxy path uses Caddy, but needs DNS/firewall verification on the Linode server.
 - Shared Linode server has another container using port `80`; finance tracker can run with Caddy bound to `443` only.
-- Production backup/restore path is not configured yet.
+- Production backup/restore path is documented and smoke-tested with fake data; off-server backup storage still needs to be chosen before relying on real data.
 - SQLite may need to be replaced by PostgreSQL if deployment, concurrency, or backup needs outgrow it.
 
 ## Completion Notes
@@ -139,8 +147,17 @@ Results:
 - Docker startup passed.
 - `/health` returned `{"status":"ok"}`.
 - `/` rendered the foundation page.
+- Production `.env` was created on Linode with restrictive file permissions and a generated inbound SMS secret.
+- Added `.dockerignore` so `.env`, `.venv`, caches, git metadata, and local data directories are excluded from Docker images.
+- Added a config regression test so app settings ignore unrelated deployment dotenv keys such as `CADDY_DOMAIN`.
+- Narrowed the Caddy container environment so it receives `CADDY_DOMAIN` only, then rotated the inbound SMS secret.
+- Restarted the shared-server production stack and verified `https://daily-expense.duckdns.org/health` returns `{"status":"ok"}`.
+- Verified the app container has no public `8000` listener in production.
+- Added and smoke-tested SQLite backup/restore commands with fake data through the shared-server Compose path.
 
 Host-only Python checks were not run because the host is missing `python3.12-venv` and `python3-pip`. README documents the required packages.
+
+No git remote is configured, so remote CI was not observed from this server. The GitHub Actions workflow exists and the Docker-based local checks pass.
 
 Linode VPS was identified as the target deployment environment during review. Added deployment notes for Docker Compose, HTTPS, firewalling, secrets, and backups.
 
@@ -149,3 +166,5 @@ Caddy was selected for the initial Linode HTTPS reverse proxy path during review
 Deployment domain set to `daily-expense.duckdns.org` during review.
 
 Added a shared-server Compose override for Linode hosts where another website already owns port `80`.
+
+Sprint 0 completed on 2026-05-05.

@@ -7,3 +7,4 @@ services:
       - .env.example
     volumes:
       - ./data:/app/data
+      - ./backups:/app/backups
