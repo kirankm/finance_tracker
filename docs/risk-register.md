@@ -6,6 +6,7 @@
 | LLM misclassifies transactions | Wrong spending analysis | LLM suggestions are soft; rules/user corrections override | Open |
 | Duplicate detection false positives | Real transactions may be excluded | Possible duplicates require review | Open |
 | Raw SMS leakage in logs | Privacy issue | Logging rules, fake fixtures, review sensitive logs | Open |
+| Review detail endpoints expose raw SMS body | Privacy issue if endpoint access is not controlled | Review queue endpoints require the same shared secret as inbound SMS; list responses omit raw SMS bodies | Partially mitigated |
 | Ledger mismatch logic is wrong | User loses trust in balances | TDD with ledger fixtures and explainability metadata | Open |
 | Deterministic categorization rules are wrong or too broad | Transactions may be assigned to the wrong category or merchant | Keep Sprint 4 rules narrow, fake-fixture based, explainable, and reviewable; add golden fixtures for each new rule | Open |
 | External SMS forwarding service changes payload format | Ingestion may break | Validate payloads and add contract tests | Open |
