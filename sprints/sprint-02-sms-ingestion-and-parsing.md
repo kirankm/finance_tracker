@@ -120,3 +120,6 @@ Implementation continued after review approval on 2026-05-05.
 - Review follow-up: made duplicate `message_id` delivery idempotent with a 200 response and no second row.
 - Review follow-up checks passed with 20 tests, lint, and mypy.
 - Verified golden SMS fixtures use fake/anonymized placeholder bank, account, merchant, and reference values.
+- Redeployed the hardened ingestion build to the public HTTPS stack.
+- Public post-hardening QA verified health 200, missing/wrong secret 401 before body validation, valid fake SMS 201, duplicate message replay 200, and malformed valid-auth payload 422.
+- Recent app logs after post-hardening QA showed request lines/statuses only, not full raw SMS content.
