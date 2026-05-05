@@ -6,7 +6,7 @@
 
 ## Sprint Status
 
-review
+done
 
 Allowed values:
 - planning
@@ -17,11 +17,11 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 0: Project Setup
+Sprint 1: Core Ledger Foundation
 
 ## Current Focus
 
-Review the Sprint 1 core ledger foundation implementation.
+Ready to plan Sprint 2.
 
 ## Current Branch
 
