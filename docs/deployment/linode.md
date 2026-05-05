@@ -30,7 +30,7 @@ Edit `.env` on the server:
 ENVIRONMENT=production
 INBOUND_SMS_SECRET=<strong-random-secret>
 DATABASE_URL=sqlite:///./data/finance_tracker.db
-CADDY_DOMAIN=<your-domain.example>
+CADDY_DOMAIN=daily-expense.duckdns.org
 ```
 
 Use the local Compose file for a plain health check on the server:
@@ -52,7 +52,7 @@ docker compose down
 Confirm DNS points to the Linode IP:
 
 ```bash
-dig +short <your-domain.example>
+dig +short daily-expense.duckdns.org
 ```
 
 Start the production stack:
@@ -60,7 +60,7 @@ Start the production stack:
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build -d
 docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
-curl https://<your-domain.example>/health
+curl https://daily-expense.duckdns.org/health
 ```
 
 Caddy listens on ports `80` and `443`, obtains certificates automatically, and proxies traffic to the app over the internal Docker network. The production override removes the public `8000` port mapping from the app service.

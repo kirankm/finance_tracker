@@ -120,7 +120,7 @@ docker compose run --rm app python -m pytest
 docker compose run --rm app python -m ruff check .
 docker compose run --rm app python -m mypy
 docker compose -f docker-compose.yml -f docker-compose.prod.yml config
-docker run --rm -e CADDY_DOMAIN=finance.example.com -v /home/kiran/projects/finance_tracker/Caddyfile:/etc/caddy/Caddyfile:ro caddy:2-alpine caddy validate --config /etc/caddy/Caddyfile
+docker run --rm -e CADDY_DOMAIN=daily-expense.duckdns.org -v /home/kiran/projects/finance_tracker/Caddyfile:/etc/caddy/Caddyfile:ro caddy:2-alpine caddy validate --config /etc/caddy/Caddyfile
 docker compose up
 curl -sS http://localhost:8000/health
 curl -sS http://localhost:8000/
@@ -143,3 +143,5 @@ Host-only Python checks were not run because the host is missing `python3.12-ven
 Linode VPS was identified as the target deployment environment during review. Added deployment notes for Docker Compose, HTTPS, firewalling, secrets, and backups.
 
 Caddy was selected for the initial Linode HTTPS reverse proxy path during review. Added `docker-compose.prod.yml`, `Caddyfile`, and a deployment decision record.
+
+Deployment domain set to `daily-expense.duckdns.org` during review.
