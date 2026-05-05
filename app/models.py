@@ -2,7 +2,7 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import JSON, Boolean, Date, ForeignKey, Numeric, String, Text
+from sqlalchemy import JSON, Boolean, Date, ForeignKey, Numeric, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import TypeDecorator
 
@@ -68,6 +68,9 @@ class Account(Base, TimestampMixin, SoftDeleteMixin):
 
 class LedgerTransaction(Base, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "ledger_transactions"
+    __table_args__ = (
+        UniqueConstraint("raw_sms_message_id", name="uq_ledger_transactions_raw_sms_message_id"),
+    )
 
     id: Mapped[str] = mapped_column(String(64), primary_key=True)
     transaction_date: Mapped[date] = mapped_column(Date, nullable=False)
@@ -78,6 +81,9 @@ class LedgerTransaction(Base, TimestampMixin, SoftDeleteMixin):
     merchant_raw: Mapped[str | None] = mapped_column(Text, nullable=True)
     merchant_canonical: Mapped[str | None] = mapped_column(String(160), nullable=True)
     account_id: Mapped[str] = mapped_column(ForeignKey("accounts.id"), nullable=False)
+    raw_sms_message_id: Mapped[str | None] = mapped_column(
+        ForeignKey("raw_sms_messages.id"), nullable=True
+    )
     source: Mapped[str] = mapped_column(String(40), nullable=False)
     parsing_confidence: Mapped[str | None] = mapped_column(String(20), nullable=True)
     merchant_mapping_confidence: Mapped[str | None] = mapped_column(String(20), nullable=True)
@@ -88,6 +94,10 @@ class LedgerTransaction(Base, TimestampMixin, SoftDeleteMixin):
     source_metadata: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
 
     account: Mapped[Account] = relationship(back_populates="transactions")
+    raw_sms_message: Mapped["RawSmsMessage | None"] = relationship(
+        back_populates="ledger_transaction",
+        uselist=False,
+    )
     audit_events: Mapped[list["AuditEvent"]] = relationship(
         back_populates="transaction", cascade="save-update, merge"
     )
@@ -104,6 +114,11 @@ class RawSmsMessage(Base, TimestampMixin):
     source: Mapped[str] = mapped_column(String(40), nullable=False)
     processing_status: Mapped[str] = mapped_column(String(40), nullable=False)
     parser_output: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
+
+    ledger_transaction: Mapped[LedgerTransaction | None] = relationship(
+        back_populates="raw_sms_message",
+        uselist=False,
+    )
 
 
 class AuditEvent(Base, TimestampMixin):

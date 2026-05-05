@@ -2,11 +2,11 @@
 
 ## Current Sprint
 
-Sprint 5: Review Queue
+Sprint 6: Ledger Promotion
 
 ## Sprint Status
 
-done
+review
 
 Allowed values:
 - planning
@@ -21,11 +21,11 @@ Sprint 5: Review Queue
 
 ## Current Focus
 
-Plan Sprint 6 ledger promotion.
+Open Sprint 6 PR and wait for CI.
 
 ## Current Branch
 
-`main`
+`sprint-06-ledger-promotion`
 
 ## Open Blockers
 
@@ -39,3 +39,5 @@ Plan Sprint 6 ledger promotion.
 Keep this file short. Detailed history belongs in sprint docs and decision records.
 
 GitHub remote is configured, `main` is the default branch, and GitHub Actions passed on the Sprint 5 PR.
+
+V1 roadmap through the V2 planning boundary is drafted in `docs/roadmap-2026-05-05.md`.

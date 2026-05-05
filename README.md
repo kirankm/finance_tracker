@@ -19,10 +19,12 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 5 review queue is merged to `main`. The app has authenticated SMS
+Sprint 6 ledger promotion is in progress. The app has authenticated SMS
 ingestion, the selected Android forwarder adapter, deterministic fake-rule
 enrichment for account mapping, merchant normalization, and category assignment,
-and an authenticated backend review queue for stored SMS transaction candidates.
+an authenticated backend review queue for stored SMS transaction candidates, and
+an authenticated path for promoting reviewed fake candidates into ledger
+transactions.
 
 ## Development Commands
 
@@ -171,8 +173,52 @@ Payload:
 }
 ```
 
-Sprint 5 stores review decision metadata on the parsed candidate output. Ledger
-promotion and correction flows are intentionally deferred.
+Review decision metadata is stored on the parsed candidate output. Correction
+flows are intentionally deferred.
+
+## Ledger Promotion Development Contract
+
+Ledger promotion uses the same development shared secret header as inbound SMS
+and review queue endpoints:
+
+```text
+X-Inbound-SMS-Secret: <INBOUND_SMS_SECRET>
+```
+
+Promote one reviewed review item:
+
+```text
+POST /api/review-queue/{raw_sms_id}/promote
+```
+
+Payload:
+
+```json
+{
+  "reason": "fake ledger QA"
+}
+```
+
+A reviewed, fully mapped fake candidate creates one `LedgerTransaction` and
+returns `201`:
+
+```json
+{
+  "status": "promoted",
+  "ledger_transaction_id": "txn_...",
+  "raw_sms_id": "raw_sms_..."
+}
+```
+
+Replaying promotion for the same raw SMS returns the existing transaction with
+`200` and `status: "already_promoted"`. Unreviewed candidates return `409`.
+Candidates missing required ledger fields return `422`. Missing raw SMS ids
+return `404`.
+
+Sprint 6 links promoted ledger transactions to `RawSmsMessage` through
+`raw_sms_message_id` and stores source metadata for parser, rule, review,
+reference, and available-balance context. Duplicate detection across different
+SMS messages and ledger balance mismatch checks are intentionally deferred.
 
 ## Selected Android Forwarder Pilot
 

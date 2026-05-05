@@ -5,6 +5,7 @@
 | SMS formats vary across banks and payment systems | Parser may miss or misread transactions | Build golden dataset and add fixtures per pattern | Open |
 | LLM misclassifies transactions | Wrong spending analysis | LLM suggestions are soft; rules/user corrections override | Open |
 | Duplicate detection false positives | Real transactions may be excluded | Possible duplicates require review | Open |
+| Duplicate SMS messages can still be promoted as separate ledger transactions before Sprint 7 | Ledger totals may be overstated if banks or forwarders send distinct duplicate messages | Sprint 6 only enforces idempotency for the same raw SMS; Sprint 7 will add cross-message duplicate detection before analysis is trusted | Open |
 | Raw SMS leakage in logs | Privacy issue | Logging rules, fake fixtures, review sensitive logs | Open |
 | Review detail endpoints expose raw SMS body | Privacy issue if endpoint access is not controlled | Review queue endpoints require the same shared secret as inbound SMS; list responses omit raw SMS bodies | Partially mitigated |
 | Ledger mismatch logic is wrong | User loses trust in balances | TDD with ledger fixtures and explainability metadata | Open |

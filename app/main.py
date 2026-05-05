@@ -14,6 +14,11 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db_session
+from app.ledger_promotion import (
+    LedgerPromotionPayload,
+    LedgerPromotionResponse,
+    promote_reviewed_sms_candidate,
+)
 from app.models import RawSmsMessage
 from app.review_queue import (
     ReviewDecisionPayload,
@@ -221,6 +226,24 @@ def review_queue_mark_reviewed(
     db_session: Annotated[Session, Depends(get_db_session)],
 ) -> ReviewQueueDetail:
     return mark_review_item_reviewed(db_session, raw_sms_id, payload)
+
+
+@app.post(
+    "/api/review-queue/{raw_sms_id}/promote",
+    response_model=LedgerPromotionResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def review_queue_promote_to_ledger(
+    raw_sms_id: str,
+    payload: LedgerPromotionPayload,
+    response: Response,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> LedgerPromotionResponse:
+    promotion_response, status_code = promote_reviewed_sms_candidate(
+        db_session, raw_sms_id, payload
+    )
+    response.status_code = status_code
+    return promotion_response
 
 
 @app.get("/", response_class=HTMLResponse)
