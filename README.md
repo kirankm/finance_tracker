@@ -19,9 +19,10 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 4 is in review on the sprint branch. The app has authenticated SMS
-ingestion, the selected Android forwarder adapter, and deterministic fake-rule
-enrichment for account mapping, merchant normalization, and category assignment.
+Sprint 4 rules and categorization is merged to `main`. The app has authenticated
+SMS ingestion, the selected Android forwarder adapter, and deterministic
+fake-rule enrichment for account mapping, merchant normalization, and category
+assignment.
 
 ## Development Commands
 

@@ -6,7 +6,7 @@ Sprint 4: Rules and Categorization
 
 ## Sprint Status
 
-review
+done
 
 Allowed values:
 - planning
@@ -17,11 +17,11 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 3: SMS Forwarder Integration
+Sprint 4: Rules and Categorization
 
 ## Current Focus
 
-Review Sprint 4 deterministic rules and categorization.
+Plan Sprint 5 review queue.
 
 ## Current Branch
 
@@ -38,4 +38,4 @@ Review Sprint 4 deterministic rules and categorization.
 
 Keep this file short. Detailed history belongs in sprint docs and decision records.
 
-GitHub remote is configured, `main` is the default branch, and GitHub Actions passed on the Sprint 3 PR.
+GitHub remote is configured, `main` is the default branch, and GitHub Actions passed on the Sprint 4 PR.
