@@ -19,7 +19,8 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 1 core ledger foundation is merged to `main`. The project is ready for Sprint 2 planning.
+Sprint 2 SMS ingestion and parsing is merged to `main`. Sprint 3 is integrating the
+first selected Android SMS-to-webhook forwarding path on a sprint branch.
 
 ## Development Commands
 
@@ -122,3 +123,39 @@ Payload:
 ```
 
 The endpoint stores the raw SMS body for traceability, returns parser candidate metadata for review, and must not log full raw SMS content.
+
+## Selected Android Forwarder Pilot
+
+Sprint 3 uses `bogkonstantin/android_income_sms_gateway_webhook` as the first
+forwarder pilot.
+
+Endpoint:
+
+```text
+POST /api/forwarders/android-income-sms-webhook
+X-Inbound-SMS-Secret: <INBOUND_SMS_SECRET>
+```
+
+Selected forwarder payload:
+
+```json
+{
+  "from": "FAKEBANK",
+  "text": "Rs.480 debited from BANK_1 a/c XX0000 to MERCHANT_FOOD_1 on 04-May-2026. Avl Bal Rs.50000. Ref 123456.",
+  "sentStamp": "1777890599000",
+  "receivedStamp": "1777890600000",
+  "sim": "SIM1"
+}
+```
+
+Mapping:
+
+| Forwarder field | Internal field |
+|---|---|
+| `from` | `sender` |
+| `text` | `body` |
+| `receivedStamp` | `received_at` |
+| `from` + `text` + `receivedStamp` + `sim` hash | `message_id` |
+
+`receivedStamp` is accepted as epoch milliseconds. Replaying the same payload is
+idempotent because the backend derives the same deterministic `message_id`.

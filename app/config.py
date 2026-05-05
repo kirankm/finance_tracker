@@ -1,7 +1,7 @@
 from functools import lru_cache
-from typing import Literal
+from typing import Literal, Self
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -21,6 +21,17 @@ class Settings(BaseSettings):
         if not value.strip():
             raise ValueError("inbound_sms_secret must not be blank")
         return value
+
+    @model_validator(mode="after")
+    def production_must_not_use_development_inbound_sms_secret(self) -> Self:
+        if (
+            self.environment == "production"
+            and self.inbound_sms_secret == "change-me-in-development"
+        ):
+            raise ValueError(
+                "production inbound_sms_secret must not use the development default"
+            )
+        return self
 
 
 @lru_cache

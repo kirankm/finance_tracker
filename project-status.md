@@ -2,11 +2,11 @@
 
 ## Current Sprint
 
-Sprint 2: SMS Ingestion and Parsing
+Sprint 3: SMS Forwarder Integration
 
 ## Sprint Status
 
-done
+review
 
 Allowed values:
 - planning
@@ -21,15 +21,15 @@ Sprint 2: SMS Ingestion and Parsing
 
 ## Current Focus
 
-Select and plan the next sprint after Sprint 2 merge.
+Review Sprint 3 selected forwarder adapter after Docker checks, fake HTTPS QA, and review hardening fixes.
 
 ## Current Branch
 
-`main`
+`sprint-03-sms-forwarder-integration`
 
 ## Open Blockers
 
-- SMS forwarding service not selected.
+- SMS forwarding service not finalized; Sprint 3 proposes `bogkonstantin/android_income_sms_gateway_webhook` as the first pilot candidate.
 - Exact external SMS forwarding payload contract not finalized.
 - Host Python local checks need `python3.12-venv` and `python3-pip`; Docker checks pass.
 - Backups are documented and smoke-tested locally; off-server backup storage still needs to be chosen before relying on real data.
