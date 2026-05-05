@@ -55,12 +55,12 @@ Create the durable core data model for accounts, transactions, and audit history
 
 ## QA Checklist
 
-- [ ] Run `docker compose run --rm app python -m pytest`.
-- [ ] Run `docker compose run --rm app python -m ruff check .`.
-- [ ] Run `docker compose run --rm app python -m mypy`.
-- [ ] Run migration upgrade against a disposable SQLite database.
-- [ ] Verify no real SMS or financial data is committed.
-- [ ] Verify production Compose config still hides app port `8000`.
+- [x] Run `docker compose run --rm app python -m pytest`.
+- [x] Run `docker compose run --rm app python -m ruff check .`.
+- [x] Run `docker compose run --rm app python -m mypy`.
+- [x] Run migration upgrade against a disposable SQLite database.
+- [x] Verify no real SMS or financial data is committed.
+- [x] Verify production Compose config still hides app port `8000`.
 
 ## Risks / Open Questions
 
@@ -71,3 +71,20 @@ Create the durable core data model for accounts, transactions, and audit history
 ## Completion Notes
 
 Sprint plan created on 2026-05-05. Stop for review before implementation.
+
+Implementation continued after review approval on 2026-05-05.
+
+- Added SQLAlchemy database/session foundation.
+- Added account, ledger transaction, and audit event models.
+- Added soft-delete fields to accounts and ledger transactions.
+- Added Alembic migration `20260505_0919_initial_ledger_tables`.
+- Added focused TDD tests for account persistence, transaction persistence, audit linkage, and soft-delete metadata.
+- Recorded Decision 0006 for the lean relational ledger schema.
+- Migration smoke passed against disposable SQLite with tables: `accounts`, `ledger_transactions`, `audit_events`, and `alembic_version`.
+- `docker compose run --rm app python -m pytest` passed with 12 tests.
+- `docker compose run --rm app python -m ruff check .` passed.
+- `docker compose run --rm app python -m mypy` passed with no issues in 10 source files.
+- Production Compose config validation passed, and `ss -ltnp` showed no public listener on port `8000`.
+- Remote CI initially failed during dependency installation because setuptools auto-discovered non-package top-level directories. Fixed by explicitly packaging only `app`.
+- Remote CI passed on GitHub Actions for commit `33dd88b`.
+- Sprint 1 marked done on 2026-05-05 after remote CI passed and merge preparation started.

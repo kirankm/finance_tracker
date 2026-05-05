@@ -19,7 +19,7 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 0 implementation is in review.
+Sprint 1 core ledger foundation is in review.
 
 ## Development Commands
 
@@ -58,6 +58,19 @@ Run typecheck:
 ```bash
 . .venv/bin/activate
 python -m mypy
+```
+
+Run database migrations:
+
+```bash
+. .venv/bin/activate
+python -m alembic upgrade head
+```
+
+Run a disposable SQLite migration smoke test:
+
+```bash
+DATABASE_URL=sqlite:////tmp/finance_tracker_migration_smoke.db python -m alembic upgrade head
 ```
 
 Run through Docker:
