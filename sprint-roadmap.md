@@ -41,7 +41,18 @@ Includes:
 - confidence metadata
 - golden dataset tests
 
-## Sprint 3: Rules and Categorization
+## Sprint 3: SMS Forwarder Integration
+
+Goal: select and pilot the Android SMS-to-webhook forwarding path.
+
+Includes:
+- forwarding app/service selection
+- service-specific payload adapter
+- fake public HTTPS forwarding QA
+- setup documentation
+- risk update for payload drift and Android reliability
+
+## Sprint 4: Rules and Categorization
 
 Goal: map accounts, normalize merchants, and assign type/purpose/category.
 
@@ -53,7 +64,7 @@ Includes:
 - user correction influence
 - soft LLM suggestions if used
 
-## Sprint 4: Review Queue
+## Sprint 5: Review Queue
 
 Goal: make uncertain transactions reviewable and correctable.
 
@@ -63,7 +74,7 @@ Includes:
 - create rule from correction
 - correction history
 
-## Sprint 5: Trust Checks
+## Sprint 6: Trust Checks
 
 Goal: detect duplicates and ledger mismatches.
 
@@ -73,7 +84,7 @@ Includes:
 - mismatch explanations
 - review reasons
 
-## Sprint 6: Manual Transactions and Cash
+## Sprint 7: Manual Transactions and Cash
 
 Goal: support manual expenses, cash balance updates, and cash spend reconciliation.
 
@@ -83,7 +94,7 @@ Includes:
 - cash adjustment
 - uncategorized cash spend flow
 
-## Sprint 7: Analysis
+## Sprint 8: Analysis
 
 Goal: deterministic analysis of money movement.
 
@@ -94,7 +105,7 @@ Includes:
 - investment/savings separated
 - unmapped counts
 
-## Sprint 8: Insights
+## Sprint 9: Insights
 
 Goal: surface notable findings from structured data.
 
@@ -103,7 +114,7 @@ Includes:
 - optional LLM wording only
 - reviewable insight explanations
 
-## Sprint 9: Import, Export, Backup
+## Sprint 10: Import, Export, Backup
 
 Goal: let the user safely move and recover data.
 

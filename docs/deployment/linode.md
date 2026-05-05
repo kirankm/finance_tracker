@@ -115,10 +115,38 @@ This allows `daily-expense.duckdns.org` to use HTTPS on port `443` while the exi
 ## Before Real SMS Ingestion
 
 - Confirm Caddy can issue and renew HTTPS certificates for `CADDY_DOMAIN`.
-- Confirm the external SMS forwarding service can send HTTPS requests.
-- Add authenticated ingestion contract tests.
+- Confirm the selected Android forwarder can send HTTPS requests.
+- Confirm the selected Android forwarder can include `X-Inbound-SMS-Secret`.
+- Confirm fake payload QA passes against `/api/forwarders/android-income-sms-webhook`.
 - Confirm production logs do not include full raw SMS content.
 - Run and verify the SQLite backup/restore path in `docs/deployment/backup-restore.md`, or move to PostgreSQL.
+
+## Selected Android Forwarder Setup
+
+Sprint 3 pilots `bogkonstantin/android_income_sms_gateway_webhook`.
+
+Configure the app with:
+
+```text
+URL: https://daily-expense.duckdns.org/api/forwarders/android-income-sms-webhook
+HTTP method: POST
+Content-Type: application/json; charset=utf-8
+```
+
+Payload template:
+
+```json
+{
+  "from": "%from%",
+  "text": "%text%",
+  "sentStamp": "%sentStamp%",
+  "receivedStamp": "%receivedStamp%",
+  "sim": "%sim%"
+}
+```
+
+Only use fake/test SMS until HTTPS, authentication, duplicate replay, and log
+review have passed.
 
 ## Backup Requirement
 
