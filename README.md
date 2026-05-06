@@ -19,14 +19,15 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 16 analysis screen is merged to `main`. The app has authenticated SMS
+Sprint 17 insights screen is merged to `main`. The app has authenticated SMS
 ingestion, the selected Android forwarder adapter, deterministic fake-rule
 enrichment for account mapping, merchant normalization, and category assignment,
 an authenticated backend review queue for stored SMS transaction candidates, an
 authenticated path for promoting reviewed fake candidates into ledger
 transactions with deterministic duplicate and ledger sanity checks, account and
 category management, manual transaction workflows, cash balance updates, and
-structured ledger search/filtering, and deterministic analysis summaries.
+structured ledger search/filtering, deterministic analysis summaries, and
+deterministic insights.
 
 ## Development Commands
 
@@ -555,6 +556,39 @@ Each insight links to underlying ledger transaction IDs and includes structured
 metadata. Insight copy is deterministic; LLMs do not determine insight truth.
 Dismiss and review actions create audit events and are hidden from the default
 insight list unless explicitly included.
+
+## User-Approved Rules Development Contract
+
+Sprint 18 adds authenticated user-approved rule endpoints:
+
+```text
+GET /api/rule-candidates
+POST /api/rule-candidates/{candidate_id}/approve
+POST /api/rule-candidates/{candidate_id}/reject
+
+GET /api/user-rules
+PATCH /api/user-rules/{rule_id}
+POST /api/user-rules/{rule_id}/disable
+```
+
+Rule candidates are derived from user correction metadata on review candidates
+and ledger transactions. Approving a candidate creates an enabled `UserRule`.
+Rejecting a candidate creates an audit event and does not create a rule. Editing
+and disabling rules are also audited.
+
+Enabled user-approved rules are loaded during inbound SMS enrichment and apply
+before built-in deterministic rules. Sprint 18 supports exact fake
+`merchant_raw` and `account_clue` match conditions, with user-approved set
+values for account, canonical merchant, category, and purpose.
+
+Rule priority order for future candidates is:
+
+```text
+user-approved rule > existing deterministic rule > unknown
+```
+
+Already-corrected review candidates and ledger transactions keep their explicit
+user correction metadata and are not silently rewritten by new rules.
 
 ## Selected Android Forwarder Pilot
 

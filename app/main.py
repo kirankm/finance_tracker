@@ -75,6 +75,19 @@ from app.review_queue import (
 )
 from app.rules import enrich_candidate
 from app.sms_parser import parse_sms
+from app.user_rules import (
+    RuleCandidateActionPayload,
+    RuleCandidateApprovePayload,
+    UserRuleActionPayload,
+    UserRuleUpdatePayload,
+    approve_rule_candidate,
+    disable_user_rule,
+    list_rule_candidates,
+    list_user_rules,
+    load_enabled_user_approved_rules,
+    reject_rule_candidate,
+    update_user_rule,
+)
 
 settings = get_settings()
 templates = Jinja2Templates(directory="app/templates")
@@ -158,6 +171,8 @@ async def require_inbound_sms_secret(
             or request.url.path.startswith("/api/insights")
             or request.url.path.startswith("/api/ledger-transactions")
             or request.url.path.startswith("/api/manual-transactions")
+            or request.url.path.startswith("/api/rule-candidates")
+            or request.url.path.startswith("/api/user-rules")
             or request.url.path.startswith("/api/export")
             or request.url.path.startswith("/api/accounts")
             or request.url.path.startswith("/api/categories")
@@ -201,7 +216,10 @@ def persist_inbound_sms(
             candidate=existing_raw_sms.parser_output,
         )
 
-    candidate = enrich_candidate(parse_sms(payload.body))
+    candidate = enrich_candidate(
+        parse_sms(payload.body),
+        user_rules=load_enabled_user_approved_rules(db_session),
+    )
     parser_output = candidate.model_dump(exclude_none=True)
     raw_sms = RawSmsMessage(
         id=f"raw_sms_{uuid4().hex}",
@@ -421,6 +439,57 @@ def insights_review(
     db_session: Annotated[Session, Depends(get_db_session)],
 ) -> dict[str, object]:
     return mark_insight_reviewed(db_session, insight_id, payload)
+
+
+@app.get("/api/rule-candidates")
+def rule_candidates_list(
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return list_rule_candidates(db_session)
+
+
+@app.post("/api/rule-candidates/{candidate_id}/approve", status_code=status.HTTP_201_CREATED)
+def rule_candidates_approve(
+    candidate_id: str,
+    payload: RuleCandidateApprovePayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return approve_rule_candidate(db_session, candidate_id, payload)
+
+
+@app.post("/api/rule-candidates/{candidate_id}/reject")
+def rule_candidates_reject(
+    candidate_id: str,
+    payload: RuleCandidateActionPayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return reject_rule_candidate(db_session, candidate_id, payload)
+
+
+@app.get("/api/user-rules")
+def user_rules_list(
+    db_session: Annotated[Session, Depends(get_db_session)],
+    include_disabled: bool = True,
+) -> dict[str, object]:
+    return list_user_rules(db_session, include_disabled=include_disabled)
+
+
+@app.patch("/api/user-rules/{rule_id}")
+def user_rules_update(
+    rule_id: str,
+    payload: UserRuleUpdatePayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return update_user_rule(db_session, rule_id, payload)
+
+
+@app.post("/api/user-rules/{rule_id}/disable")
+def user_rules_disable(
+    rule_id: str,
+    payload: UserRuleActionPayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return disable_user_rule(db_session, rule_id, payload)
 
 
 @app.post("/api/manual-transactions", status_code=status.HTTP_201_CREATED)

@@ -426,6 +426,29 @@
           <div id="insightsMessage" class="message muted"></div>
           <div id="insightsList" class="queue" data-testid="insights-list"></div>
         </section>
+
+        <section class="panel wide stack" data-testid="rules-panel">
+          <div class="row">
+            <h2>Rules</h2>
+            <span id="ruleCandidateCount" class="status">0 candidates</span>
+            <span id="userRuleCount" class="status">0 rules</span>
+          </div>
+          <div class="row">
+            <button id="loadRuleCandidates" type="button">Load Candidates</button>
+            <button id="loadUserRules" type="button" class="secondary">Load Rules</button>
+          </div>
+          <div id="rulesMessage" class="message muted"></div>
+          <div class="grid">
+            <div>
+              <h3>Rule Candidates</h3>
+              <div id="ruleCandidatesList" class="queue" data-testid="rule-candidates-list"></div>
+            </div>
+            <div>
+              <h3>User Rules</h3>
+              <div id="userRulesList" class="queue" data-testid="user-rules-list"></div>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
 
@@ -718,6 +741,54 @@
         }
       }
 
+      function renderRuleCandidates(items) {
+        const list = document.querySelector("#ruleCandidatesList");
+        list.replaceChildren();
+        items.forEach((item) => {
+          const node = document.createElement("div");
+          node.className = "queue-item";
+          appendText(node, "strong", item.default_name || item.id);
+          appendText(node, "span", `${JSON.stringify(item.match)} -> ${JSON.stringify(item.proposed_values)}`);
+          appendText(node, "span", item.status || "candidate", "muted");
+          list.appendChild(node);
+        });
+      }
+
+      function renderUserRules(items) {
+        const list = document.querySelector("#userRulesList");
+        list.replaceChildren();
+        items.forEach((item) => {
+          const node = document.createElement("div");
+          node.className = "queue-item";
+          appendText(node, "strong", item.name || item.id);
+          appendText(node, "span", `${item.match_merchant_raw || item.match_account_clue || "-"} -> ${item.set_category || item.set_merchant_canonical || item.set_purpose || "-"}`);
+          appendText(node, "span", item.enabled ? "enabled" : "disabled", "muted");
+          list.appendChild(node);
+        });
+      }
+
+      async function loadRuleCandidates() {
+        try {
+          const payload = await api("/api/rule-candidates", { headers: secretHeaders() });
+          renderRuleCandidates(payload.items || []);
+          document.querySelector("#ruleCandidateCount").textContent = `${payload.total || 0} candidates`;
+          show("#rulesMessage", "Loaded rule candidates.", "success");
+        } catch (error) {
+          show("#rulesMessage", error.message, "error");
+        }
+      }
+
+      async function loadUserRules() {
+        try {
+          const payload = await api("/api/user-rules", { headers: secretHeaders() });
+          renderUserRules(payload.items || []);
+          document.querySelector("#userRuleCount").textContent = `${payload.total || 0} rules`;
+          show("#rulesMessage", "Loaded user rules.", "success");
+        } catch (error) {
+          show("#rulesMessage", error.message, "error");
+        }
+      }
+
       async function loadQueue() {
         try {
           const payload = await api("/api/review-queue", { headers: secretHeaders() });
@@ -811,6 +882,8 @@
       document.querySelector("#loadLedgerTransactions").addEventListener("click", loadLedgerTransactions);
       document.querySelector("#loadAnalysis").addEventListener("click", loadAnalysis);
       document.querySelector("#loadInsights").addEventListener("click", loadInsights);
+      document.querySelector("#loadRuleCandidates").addEventListener("click", loadRuleCandidates);
+      document.querySelector("#loadUserRules").addEventListener("click", loadUserRules);
       document.querySelector("#saveCorrection").addEventListener("click", saveCorrection);
       document.querySelector("#markReviewed").addEventListener("click", markReviewed);
       document.querySelector("#promote").addEventListener("click", promote);

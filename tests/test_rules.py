@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from app.rules import enrich_candidate
+from app.rules import UserApprovedRule, enrich_candidate
 from app.sms_parser import TransactionCandidate, parse_sms
 
 FIXTURE_DIR = Path(__file__).parent / "fixtures" / "sms" / "golden"
@@ -59,6 +59,34 @@ def test_known_merchant_maps_to_canonical_merchant_and_category() -> None:
     assert enriched.rule_metadata["category"] == {
         "rule_id": "merchant_food_1_v1",
         "source": "merchant_default_category",
+    }
+
+
+def test_user_approved_rule_overrides_existing_deterministic_rule() -> None:
+    candidate = parse_sms(
+        "Rs.480 debited from BANK_1 a/c XX0000 to MERCHANT_FOOD_1 on "
+        "04-May-2026. Avl Bal Rs.50000. Ref 123456."
+    )
+
+    enriched = enrich_candidate(
+        candidate,
+        user_rules=[
+            UserApprovedRule(
+                rule_id="rule_user_food_groceries",
+                match_merchant_raw="MERCHANT_FOOD_1",
+                set_merchant_canonical="User Food Rule",
+                set_category="groceries",
+                priority=10,
+            )
+        ],
+    )
+
+    assert enriched.merchant_canonical == "User Food Rule"
+    assert enriched.category == "groceries"
+    assert enriched.rule_metadata["user_approved_rule"] == {
+        "rule_id": "rule_user_food_groceries",
+        "matched_fields": ["merchant_raw"],
+        "priority": 10,
     }
 
 
