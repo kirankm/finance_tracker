@@ -65,6 +65,7 @@ from app.manual_transactions import (
     update_manual_transaction,
 )
 from app.models import RawSmsMessage
+from app.operational_readiness import operational_readiness
 from app.review_queue import (
     ReviewDecisionPayload,
     ReviewQueueDetail,
@@ -175,6 +176,7 @@ async def require_inbound_sms_secret(
             or request.url.path.startswith("/api/user-rules")
             or request.url.path.startswith("/api/export")
             or request.url.path.startswith("/api/import")
+            or request.url.path.startswith("/api/ops")
             or request.url.path.startswith("/api/accounts")
             or request.url.path.startswith("/api/categories")
         )
@@ -557,6 +559,11 @@ def export_json_data(
 @app.post("/api/import/json/validate")
 def import_json_validate(payload: dict[str, object]) -> dict[str, object]:
     return validate_import_json(payload)
+
+
+@app.get("/api/ops/readiness")
+def ops_readiness() -> dict[str, object]:
+    return operational_readiness(settings)
 
 
 @app.get("/api/export/ledger-transactions.csv")

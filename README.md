@@ -371,6 +371,19 @@ The validator supports export `format_version` 1 and 2. Version 1 is accepted
 with a warning because it predates user-approved rules. Validation checks shape
 and reports section counts; it does not write to the live database.
 
+## Operational Readiness Contract
+
+Sprint 20 adds an authenticated readiness endpoint:
+
+```text
+GET /api/ops/readiness
+```
+
+The endpoint reports production pilot checks without exposing secret values. A
+development-default `INBOUND_SMS_SECRET` is reported as a blocker. Real SMS
+remains no-go until the Android forwarder fake-device validation and off-server
+backup gates in `docs/deployment/production-pilot-go-no-go.md` pass.
+
 ## Account and Category Management Development Contract
 
 Sprint 12 adds authenticated management endpoints using the same shared secret
