@@ -206,21 +206,23 @@ returns `201`:
 {
   "status": "promoted",
   "ledger_transaction_id": "txn_...",
-  "raw_sms_id": "raw_sms_..."
+  "raw_sms_id": "raw_sms_...",
+  "duplicate_status": "unique",
+  "ledger_status": "included",
+  "ledger_sanity_status": "matched"
 }
 ```
 
 Replaying promotion for the same raw SMS returns the existing transaction with
 `200` and `status: "already_promoted"`. Promotion responses include
-`duplicate_status` and `ledger_status`. Unreviewed candidates return `409`.
-Candidates missing required ledger fields return `422`. Missing raw SMS ids
-return `404`.
+`duplicate_status`, `ledger_status`, and `ledger_sanity_status`. Unreviewed
+candidates return `409`. Candidates missing required ledger fields return
+`422`. Missing raw SMS ids return `404`.
 
 Sprint 6 links promoted ledger transactions to `RawSmsMessage` through
 `raw_sms_message_id` and stores source metadata for parser, rule, review,
 reference, and available-balance context. Sprint 7 adds cross-message duplicate
-detection during promotion. Ledger balance mismatch checks are intentionally
-deferred.
+detection during promotion. Sprint 8 adds promotion-time ledger sanity metadata.
 
 ## Duplicate Detection Development Contract
 
@@ -238,6 +240,29 @@ Status behavior:
 Duplicate decisions are stored in ledger `source_metadata.duplicate_detection`
 and raw SMS `parser_output.duplicate_detection`. Duplicate promotions are kept
 for traceability and audit history; they are not deleted or silently dropped.
+
+## Ledger Sanity Development Contract
+
+Sprint 8 checks SMS available balance during ledger promotion when enough
+balance context exists.
+
+The check uses `Account.current_balance` as an explicit known pre-promotion
+balance. It applies debit and credit balance impact and compares the expected
+post-transaction balance with the SMS `available_balance`.
+
+Status behavior:
+
+| Context | `ledger_sanity_status` | `ledger_status` |
+|---|---|---|
+| Missing available balance or missing account current balance | `not_checked` | existing duplicate-derived ledger status |
+| Expected balance matches SMS available balance | `matched` | `included` |
+| Expected balance differs from SMS available balance | `mismatch` | `needs_review` |
+| Duplicate-excluded promotion | `not_checked` | `excluded` |
+
+Ledger sanity decisions are stored in ledger `source_metadata.ledger_sanity` and
+raw SMS `parser_output.ledger_sanity`. Mismatched transactions are retained for
+auditability and review; they are not silently corrected, deleted, or marked as
+duplicates.
 
 ## Selected Android Forwarder Pilot
 

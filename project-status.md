@@ -2,7 +2,7 @@
 
 ## Current Sprint
 
-Sprint 7: Duplicate Detection
+Sprint 8: Ledger Sanity Checks
 
 ## Sprint Status
 
@@ -17,11 +17,11 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 7: Duplicate Detection
+Sprint 8: Ledger Sanity Checks
 
 ## Current Focus
 
-Plan Sprint 8 ledger sanity checks.
+Plan Sprint 9 corrections and rule learning foundation.
 
 ## Current Branch
 
@@ -46,3 +46,6 @@ Sprint 6 PR checks passed and the PR was merged to `main`.
 
 Sprint 7 duplicate detection implementation and local QA are complete; CI
 passed and PR #6 was merged to `main`.
+
+Sprint 8 ledger sanity checks implementation and local QA are complete; CI
+passed on PR #7.
