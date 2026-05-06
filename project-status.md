@@ -58,4 +58,4 @@ account/category management implementation and local QA are complete; CI passed
 and PR #9 was merged to `main`.
 
 Sprint 13 manual transaction management and Sprint 14 cash tracking
-implementation and local QA are complete; CI is pending on the sprint PR.
+implementation and local QA are complete; CI passed on PR #10.
