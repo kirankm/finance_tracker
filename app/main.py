@@ -24,6 +24,13 @@ from app.corrections import (
 )
 from app.database import get_db_session
 from app.export import export_json, export_ledger_csv
+from app.insights import (
+    InsightActionPayload,
+    InsightsParams,
+    list_insights,
+    mark_insight_dismissed,
+    mark_insight_reviewed,
+)
 from app.ledger_promotion import (
     LedgerPromotionPayload,
     LedgerPromotionResponse,
@@ -148,6 +155,7 @@ async def require_inbound_sms_secret(
             request.url.path in protected_paths
             or request.url.path.startswith("/api/review-queue")
             or request.url.path.startswith("/api/analysis")
+            or request.url.path.startswith("/api/insights")
             or request.url.path.startswith("/api/ledger-transactions")
             or request.url.path.startswith("/api/manual-transactions")
             or request.url.path.startswith("/api/export")
@@ -374,6 +382,45 @@ def analysis_summary(
         db_session,
         AnalysisParams(month=month, date_from=date_from, date_to=date_to),
     )
+
+
+@app.get("/api/insights")
+def insights_list(
+    db_session: Annotated[Session, Depends(get_db_session)],
+    month: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    include_dismissed: bool = False,
+    include_reviewed: bool = False,
+) -> dict[str, object]:
+    return list_insights(
+        db_session,
+        InsightsParams(
+            month=month,
+            date_from=date_from,
+            date_to=date_to,
+            include_dismissed=include_dismissed,
+            include_reviewed=include_reviewed,
+        ),
+    )
+
+
+@app.post("/api/insights/{insight_id}/dismiss")
+def insights_dismiss(
+    insight_id: str,
+    payload: InsightActionPayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return mark_insight_dismissed(db_session, insight_id, payload)
+
+
+@app.post("/api/insights/{insight_id}/review")
+def insights_review(
+    insight_id: str,
+    payload: InsightActionPayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return mark_insight_reviewed(db_session, insight_id, payload)
 
 
 @app.post("/api/manual-transactions", status_code=status.HTTP_201_CREATED)

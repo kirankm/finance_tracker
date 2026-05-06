@@ -19,14 +19,14 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 15 structured search and filters is merged to `main`. The app has authenticated SMS
+Sprint 16 analysis screen is merged to `main`. The app has authenticated SMS
 ingestion, the selected Android forwarder adapter, deterministic fake-rule
 enrichment for account mapping, merchant normalization, and category assignment,
 an authenticated backend review queue for stored SMS transaction candidates, an
 authenticated path for promoting reviewed fake candidates into ledger
 transactions with deterministic duplicate and ledger sanity checks, account and
 category management, manual transaction workflows, cash balance updates, and
-structured ledger search/filtering.
+structured ledger search/filtering, and deterministic analysis summaries.
 
 ## Development Commands
 
@@ -528,6 +528,33 @@ The response includes:
 
 Analysis uses deterministic ledger fields only. LLM-written insights, budgets,
 forecasting, and investment holdings are out of scope.
+
+## Insights Development Contract
+
+Sprint 17 adds authenticated deterministic insight endpoints:
+
+```text
+GET /api/insights
+POST /api/insights/{insight_id}/dismiss
+POST /api/insights/{insight_id}/review
+```
+
+`GET /api/insights` supports `month`, `date_from`, `date_to`,
+`include_dismissed`, and `include_reviewed`. Insight IDs are deterministic and
+derived from the insight type, period, linked transaction IDs, and metadata.
+
+Generated insight types include:
+
+- unmapped transactions
+- possible duplicates
+- ledger mismatches
+- cash balance differences
+- notable category changes
+
+Each insight links to underlying ledger transaction IDs and includes structured
+metadata. Insight copy is deterministic; LLMs do not determine insight truth.
+Dismiss and review actions create audit events and are hidden from the default
+insight list unless explicitly included.
 
 ## Selected Android Forwarder Pilot
 
