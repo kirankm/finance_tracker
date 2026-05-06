@@ -110,3 +110,4 @@ Sprint plan created on 2026-05-06. Implementation continued after the plan was r
 - Built the Docker app image after code and test edits.
 - Recorded Decision 0014 for storing corrections in metadata and audit events.
 - Updated the risk register for JSON correction history and deferred duplicate/ledger sanity recalculation.
+- GitHub Actions passed on PR #8 after the Sprint 9 implementation was pushed.
