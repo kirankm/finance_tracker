@@ -2,11 +2,11 @@
 
 ## Current Sprint
 
-Sprint 8: Ledger Sanity Checks
+Sprint 9: Corrections and Rule Learning Foundation
 
 ## Sprint Status
 
-done
+review
 
 Allowed values:
 - planning
@@ -21,11 +21,11 @@ Sprint 8: Ledger Sanity Checks
 
 ## Current Focus
 
-Plan Sprint 9 corrections and rule learning foundation.
+Review Sprint 9 corrections and rule learning foundation implementation.
 
 ## Current Branch
 
-`main`
+`sprint-09-corrections-rule-learning`
 
 ## Open Blockers
 
