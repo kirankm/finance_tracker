@@ -2,11 +2,11 @@
 
 ## Current Sprint
 
-Sprint 7: Duplicate Detection
+Sprint 8: Ledger Sanity Checks
 
 ## Sprint Status
 
-done
+review
 
 Allowed values:
 - planning
@@ -21,11 +21,11 @@ Sprint 7: Duplicate Detection
 
 ## Current Focus
 
-Plan Sprint 8 ledger sanity checks.
+Review Sprint 8 ledger sanity checks implementation; CI still needs to run.
 
 ## Current Branch
 
-`main`
+`sprint-08-ledger-sanity-checks`
 
 ## Open Blockers
 

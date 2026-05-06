@@ -9,6 +9,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.duplicate_detection import DuplicateDecision, detect_duplicate_candidate
+from app.ledger_sanity import LedgerSanityDecision, evaluate_ledger_sanity
 from app.models import Account, AuditEvent, LedgerTransaction, RawSmsMessage
 from app.review_queue import get_raw_sms_or_404
 
@@ -25,6 +26,7 @@ class LedgerPromotionResponse(BaseModel):
     raw_sms_id: str
     duplicate_status: str
     ledger_status: str
+    ledger_sanity_status: str
 
 
 def promote_reviewed_sms_candidate(
@@ -44,6 +46,9 @@ def promote_reviewed_sms_candidate(
                 raw_sms_id=raw_sms.id,
                 duplicate_status=existing_transaction.duplicate_status,
                 ledger_status=existing_transaction.ledger_status,
+                ledger_sanity_status=existing_transaction.source_metadata.get(
+                    "ledger_sanity", {}
+                ).get("status", "not_checked"),
             ),
             status.HTTP_200_OK,
         )
@@ -51,8 +56,14 @@ def promote_reviewed_sms_candidate(
     candidate = dict(raw_sms.parser_output)
     validate_candidate_ready_for_promotion(candidate)
     account_id = str(candidate["account_id"])
-    ensure_known_account(db_session, account_id)
+    account = ensure_known_account(db_session, account_id)
     duplicate_decision = detect_duplicate_candidate(db_session, candidate)
+    ledger_sanity_decision = evaluate_ledger_sanity(
+        db_session=db_session,
+        account=account,
+        candidate=candidate,
+        duplicate_decision=duplicate_decision,
+    )
 
     transaction = LedgerTransaction(
         id=f"txn_{uuid4().hex}",
@@ -71,8 +82,10 @@ def promote_reviewed_sms_candidate(
         category_confidence=candidate.get("confidence", {}).get("category"),
         review_status="reviewed",
         duplicate_status=duplicate_decision.status,
-        ledger_status=duplicate_decision.ledger_status,
-        source_metadata=build_source_metadata(raw_sms, candidate, duplicate_decision),
+        ledger_status=ledger_sanity_decision.ledger_status,
+        source_metadata=build_source_metadata(
+            raw_sms, candidate, duplicate_decision, ledger_sanity_decision
+        ),
     )
     db_session.add(transaction)
     db_session.flush()
@@ -89,6 +102,7 @@ def promote_reviewed_sms_candidate(
             "source": raw_sms.source,
             "duplicate_status": transaction.duplicate_status,
             "ledger_status": transaction.ledger_status,
+            "ledger_sanity_status": ledger_sanity_decision.status,
         },
         reason=payload.reason,
     )
@@ -97,7 +111,9 @@ def promote_reviewed_sms_candidate(
     parser_output = dict(raw_sms.parser_output)
     parser_output["duplicate_detection"] = duplicate_decision.as_metadata()
     parser_output["duplicate_status"] = duplicate_decision.status
-    parser_output["ledger_status"] = duplicate_decision.ledger_status
+    parser_output["ledger_sanity"] = ledger_sanity_decision.as_metadata()
+    parser_output["ledger_sanity_status"] = ledger_sanity_decision.status
+    parser_output["ledger_status"] = ledger_sanity_decision.ledger_status
     parser_output["promotion_metadata"] = {
         "ledger_transaction_id": transaction.id,
         "promoted_at": datetime.now(UTC).isoformat(),
@@ -115,6 +131,7 @@ def promote_reviewed_sms_candidate(
             raw_sms_id=raw_sms.id,
             duplicate_status=transaction.duplicate_status,
             ledger_status=transaction.ledger_status,
+            ledger_sanity_status=ledger_sanity_decision.status,
         ),
         status.HTTP_201_CREATED,
     )
@@ -179,9 +196,10 @@ def validate_candidate_ready_for_promotion(candidate: dict[str, Any]) -> None:
         )
 
 
-def ensure_known_account(db_session: Session, account_id: str) -> None:
-    if db_session.get(Account, account_id) is not None:
-        return
+def ensure_known_account(db_session: Session, account_id: str) -> Account:
+    account = db_session.get(Account, account_id)
+    if account is not None:
+        return account
 
     if account_id != "acct_bank_1":
         raise HTTPException(
@@ -189,15 +207,15 @@ def ensure_known_account(db_session: Session, account_id: str) -> None:
             detail="candidate account_id is unknown",
         )
 
-    db_session.add(
-        Account(
-            id="acct_bank_1",
-            name="Fake Bank 1",
-            account_type="bank_account",
-            balance_tracking=True,
-        )
+    account = Account(
+        id="acct_bank_1",
+        name="Fake Bank 1",
+        account_type="bank_account",
+        balance_tracking=True,
     )
+    db_session.add(account)
     db_session.flush()
+    return account
 
 
 def parse_transaction_date(value: object) -> date:
@@ -219,6 +237,7 @@ def build_source_metadata(
     raw_sms: RawSmsMessage,
     candidate: dict[str, Any],
     duplicate_decision: DuplicateDecision,
+    ledger_sanity_decision: LedgerSanityDecision,
 ) -> dict[str, Any]:
     return {
         "raw_sms_id": raw_sms.id,
@@ -230,6 +249,7 @@ def build_source_metadata(
         "reference": candidate.get("reference"),
         "available_balance": candidate.get("available_balance"),
         "duplicate_detection": duplicate_decision.as_metadata(),
+        "ledger_sanity": ledger_sanity_decision.as_metadata(),
     }
 
 
