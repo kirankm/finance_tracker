@@ -2,7 +2,7 @@
 
 ## Current Sprint
 
-Sprint 10: Minimal Review UI
+Sprint 11: Import, Export, Backup, and Real-Use Readiness
 
 ## Sprint Status
 
@@ -17,11 +17,11 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 9: Corrections and Rule Learning Foundation
+Sprint 10: Minimal Review UI
 
 ## Current Focus
 
-Complete Sprint 10 minimal review UI local checks and continue to Sprint 11.
+Complete Sprint 11 local checks and continue to Sprint 12.
 
 ## Current Branch
 

@@ -20,6 +20,7 @@ from app.corrections import (
     correct_review_candidate,
 )
 from app.database import get_db_session
+from app.export import export_json, export_ledger_csv
 from app.ledger_promotion import (
     LedgerPromotionPayload,
     LedgerPromotionResponse,
@@ -116,6 +117,7 @@ async def require_inbound_sms_secret(
             request.url.path in protected_paths
             or request.url.path.startswith("/api/review-queue")
             or request.url.path.startswith("/api/ledger-transactions")
+            or request.url.path.startswith("/api/export")
         )
         and not is_authorized_inbound_sms_request(request)
     ):
@@ -275,6 +277,20 @@ def ledger_transaction_correct(
     db_session: Annotated[Session, Depends(get_db_session)],
 ) -> LedgerTransactionCorrectionResponse:
     return correct_ledger_transaction(db_session, transaction_id, payload)
+
+
+@app.get("/api/export/json")
+def export_json_data(
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return export_json(db_session)
+
+
+@app.get("/api/export/ledger-transactions.csv")
+def export_ledger_transactions_csv(
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> Response:
+    return export_ledger_csv(db_session)
 
 
 @app.get("/", response_class=HTMLResponse)

@@ -324,6 +324,33 @@ history and rule-candidate metadata for later user-approved rule workflows.
 Rule-candidate metadata is informational only in Sprint 9. No production rule is
 created automatically from a correction.
 
+## Export Development Contract
+
+Sprint 11 adds explicit authenticated export endpoints using the same shared
+secret header:
+
+```text
+X-Inbound-SMS-Secret: <INBOUND_SMS_SECRET>
+```
+
+Export structured JSON:
+
+```text
+GET /api/export/json
+```
+
+The JSON export includes accounts, ledger transactions, raw SMS metadata, and
+audit events. It does not include raw SMS bodies by default.
+
+Export ledger CSV:
+
+```text
+GET /api/export/ledger-transactions.csv
+```
+
+Raw SMS body bulk export is intentionally deferred because it needs a separate
+privacy decision and user-facing warning.
+
 ## Selected Android Forwarder Pilot
 
 Sprint 3 uses `bogkonstantin/android_income_sms_gateway_webhook` as the first
