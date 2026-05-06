@@ -264,6 +264,57 @@ raw SMS `parser_output.ledger_sanity`. Mismatched transactions are retained for
 auditability and review; they are not silently corrected, deleted, or marked as
 duplicates.
 
+## Corrections Development Contract
+
+Sprint 9 adds authenticated correction endpoints using the same shared secret
+header as inbound SMS, review queue, and promotion endpoints:
+
+```text
+X-Inbound-SMS-Secret: <INBOUND_SMS_SECRET>
+```
+
+Correct a review candidate before promotion:
+
+```text
+PATCH /api/review-queue/{raw_sms_id}/corrections
+```
+
+Correct a promoted ledger transaction:
+
+```text
+PATCH /api/ledger-transactions/{transaction_id}/corrections
+```
+
+Payload:
+
+```json
+{
+  "updates": {
+    "merchant_canonical": "Corrected Merchant",
+    "category": "groceries"
+  },
+  "reason": "fake correction"
+}
+```
+
+Supported correction fields are `merchant_raw`, `merchant_canonical`,
+`category`, `purpose`, `account_id`, `amount`, `transaction_date`, and
+`transaction_type`. Unsupported fields return `422`. Unknown account
+corrections return `422`.
+
+Candidate corrections update the current candidate fields so promotion uses the
+corrected values, while preserving parser and rule metadata. Candidate
+correction history is stored in `parser_output.user_corrections`,
+`parser_output.correction_history`, and `parser_output.rule_candidate`.
+
+Promoted ledger corrections update the ledger transaction and create a
+`ledger_transaction_corrected` audit event with before/after values and the
+correction reason. The transaction source metadata also records correction
+history and rule-candidate metadata for later user-approved rule workflows.
+
+Rule-candidate metadata is informational only in Sprint 9. No production rule is
+created automatically from a correction.
+
 ## Selected Android Forwarder Pilot
 
 Sprint 3 uses `bogkonstantin/android_income_sms_gateway_webhook` as the first

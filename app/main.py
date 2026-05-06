@@ -13,6 +13,12 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
+from app.corrections import (
+    CorrectionPayload,
+    LedgerTransactionCorrectionResponse,
+    correct_ledger_transaction,
+    correct_review_candidate,
+)
 from app.database import get_db_session
 from app.ledger_promotion import (
     LedgerPromotionPayload,
@@ -109,6 +115,7 @@ async def require_inbound_sms_secret(
         (
             request.url.path in protected_paths
             or request.url.path.startswith("/api/review-queue")
+            or request.url.path.startswith("/api/ledger-transactions")
         )
         and not is_authorized_inbound_sms_request(request)
     ):
@@ -228,6 +235,18 @@ def review_queue_mark_reviewed(
     return mark_review_item_reviewed(db_session, raw_sms_id, payload)
 
 
+@app.patch(
+    "/api/review-queue/{raw_sms_id}/corrections",
+    response_model=ReviewQueueDetail,
+)
+def review_queue_correct_candidate(
+    raw_sms_id: str,
+    payload: CorrectionPayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> ReviewQueueDetail:
+    return correct_review_candidate(db_session, raw_sms_id, payload)
+
+
 @app.post(
     "/api/review-queue/{raw_sms_id}/promote",
     response_model=LedgerPromotionResponse,
@@ -244,6 +263,18 @@ def review_queue_promote_to_ledger(
     )
     response.status_code = status_code
     return promotion_response
+
+
+@app.patch(
+    "/api/ledger-transactions/{transaction_id}/corrections",
+    response_model=LedgerTransactionCorrectionResponse,
+)
+def ledger_transaction_correct(
+    transaction_id: str,
+    payload: CorrectionPayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> LedgerTransactionCorrectionResponse:
+    return correct_ledger_transaction(db_session, transaction_id, payload)
 
 
 @app.get("/", response_class=HTMLResponse)
