@@ -124,3 +124,20 @@ def test_review_ui_exposes_analysis_panel() -> None:
     assert "loadAnalysis" in analysis_region
     assert "analysisResults" in analysis_region
     assert "rawBody" not in analysis_region
+
+
+def test_review_ui_exposes_insights_panel() -> None:
+    with make_test_client() as client:
+        response = client.get("/")
+
+    html = response.text
+    insights_region = html.split('data-testid="insights-panel"', maxsplit=1)[1].split(
+        "</section>", maxsplit=1
+    )[0]
+    assert "/api/insights" in html
+    assert "insightsMonth" in insights_region
+    assert "loadInsights" in insights_region
+    assert "insightsList" in insights_region
+    assert "includeDismissedInsights" in insights_region
+    assert "includeReviewedInsights" in insights_region
+    assert "rawBody" not in insights_region

@@ -2,7 +2,7 @@
 
 ## Current Sprint
 
-Sprint 16: Analysis Screen
+Sprint 17: Insights Screen
 
 ## Sprint Status
 
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 16: Analysis Screen
+Sprint 17: Insights Screen
 
 ## Current Focus
 
-Prepare Sprint 17 deterministic insights screen.
+Prepare Sprint 18 user-approved rules.
 
 ## Current Branch
 
-`sprint-16-analysis-screen`
+`sprint-17-insights-screen`
 
 ## Open Blockers
 
@@ -64,4 +64,7 @@ Sprint 15 structured search and filters implementation and local QA are
 complete.
 
 Sprint 16 deterministic analysis screen implementation and local QA are
+complete.
+
+Sprint 17 deterministic insights screen implementation and local QA are
 complete.

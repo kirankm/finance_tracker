@@ -397,6 +397,35 @@
           <div id="analysisMessage" class="message muted"></div>
           <div id="analysisResults" class="grid" data-testid="analysis-results"></div>
         </section>
+
+        <section class="panel wide stack" data-testid="insights-panel">
+          <div class="row">
+            <h2>Insights</h2>
+            <span id="insightsCount" class="status">0</span>
+          </div>
+          <div class="filters">
+            <label>Month<input id="insightsMonth" type="month"></label>
+            <label>
+              Include dismissed
+              <select id="includeDismissedInsights">
+                <option value="false">false</option>
+                <option value="true">true</option>
+              </select>
+            </label>
+            <label>
+              Include reviewed
+              <select id="includeReviewedInsights">
+                <option value="false">false</option>
+                <option value="true">true</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            <button id="loadInsights" type="button">Load Insights</button>
+          </div>
+          <div id="insightsMessage" class="message muted"></div>
+          <div id="insightsList" class="queue" data-testid="insights-list"></div>
+        </section>
       </div>
     </main>
 
@@ -621,6 +650,74 @@
         }
       }
 
+      function insightsParams() {
+        const params = new URLSearchParams();
+        const month = document.querySelector("#insightsMonth").value.trim();
+        if (month) params.set("month", month);
+        params.set("include_dismissed", document.querySelector("#includeDismissedInsights").value);
+        params.set("include_reviewed", document.querySelector("#includeReviewedInsights").value);
+        return params;
+      }
+
+      function renderInsights(items) {
+        const list = document.querySelector("#insightsList");
+        list.replaceChildren();
+        items.forEach((item) => {
+          const node = document.createElement("div");
+          node.className = "queue-item";
+          appendText(node, "strong", item.title || item.type || "Insight");
+          appendText(node, "span", item.summary || "-");
+          appendText(
+            node,
+            "span",
+            `${item.severity || "-"} · ${item.state || "active"} · ${(item.transaction_ids || []).join(", ")}`,
+            "muted"
+          );
+          const actions = document.createElement("div");
+          actions.className = "row";
+          const review = document.createElement("button");
+          review.type = "button";
+          review.className = "secondary";
+          review.textContent = "Mark Reviewed";
+          review.addEventListener("click", () => updateInsightState(item.id, "review"));
+          const dismiss = document.createElement("button");
+          dismiss.type = "button";
+          dismiss.className = "secondary";
+          dismiss.textContent = "Dismiss";
+          dismiss.addEventListener("click", () => updateInsightState(item.id, "dismiss"));
+          actions.append(review, dismiss);
+          node.appendChild(actions);
+          list.appendChild(node);
+        });
+      }
+
+      async function loadInsights() {
+        try {
+          const params = insightsParams();
+          const payload = await api(`/api/insights?${params.toString()}`, {
+            headers: secretHeaders()
+          });
+          renderInsights(payload.items || []);
+          document.querySelector("#insightsCount").textContent = String(payload.total || 0);
+          show("#insightsMessage", payload.total ? "Loaded insights." : "No active insights.", "success");
+        } catch (error) {
+          show("#insightsMessage", error.message, "error");
+        }
+      }
+
+      async function updateInsightState(insightId, action) {
+        try {
+          await api(`/api/insights/${insightId}/${action}`, {
+            method: "POST",
+            headers: jsonHeaders(),
+            body: JSON.stringify({ reason: `${action} from minimal UI` })
+          });
+          await loadInsights();
+        } catch (error) {
+          show("#insightsMessage", error.message, "error");
+        }
+      }
+
       async function loadQueue() {
         try {
           const payload = await api("/api/review-queue", { headers: secretHeaders() });
@@ -713,6 +810,7 @@
       document.querySelector("#loadQueue").addEventListener("click", loadQueue);
       document.querySelector("#loadLedgerTransactions").addEventListener("click", loadLedgerTransactions);
       document.querySelector("#loadAnalysis").addEventListener("click", loadAnalysis);
+      document.querySelector("#loadInsights").addEventListener("click", loadInsights);
       document.querySelector("#saveCorrection").addEventListener("click", saveCorrection);
       document.querySelector("#markReviewed").addEventListener("click", markReviewed);
       document.querySelector("#promote").addEventListener("click", promote);
