@@ -2,7 +2,7 @@
 
 ## Current Sprint
 
-Sprint 12: Account and Category Management
+Sprint 13: Manual Transaction Management and Sprint 14: Cash Tracking
 
 ## Sprint Status
 
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 12: Account and Category Management
+Sprint 14: Cash Tracking
 
 ## Current Focus
 
-Plan Sprint 13 manual transaction management.
+Plan Sprint 15 structured search and filters.
 
 ## Current Branch
 
-`main`
+`sprint-13-14-manual-transactions-search-analysis`
 
 ## Open Blockers
 
@@ -56,3 +56,6 @@ are complete; CI passed and PR #8 was merged to `main`.
 Sprint 10 minimal review UI, Sprint 11 export readiness, and Sprint 12
 account/category management implementation and local QA are complete; CI passed
 and PR #9 was merged to `main`.
+
+Sprint 13 manual transaction management and Sprint 14 cash tracking
+implementation and local QA are complete; CI passed on PR #10.

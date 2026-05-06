@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.cash_tracking import CashBalanceUpdatePayload, update_cash_balance
 from app.config import get_settings
 from app.corrections import (
     CorrectionPayload,
@@ -41,6 +42,17 @@ from app.management import (
     list_categories,
     update_account,
     update_category,
+)
+from app.manual_transactions import (
+    ManualTransactionActionPayload,
+    ManualTransactionCreatePayload,
+    ManualTransactionUpdatePayload,
+    create_manual_transaction,
+    delete_manual_transaction,
+    ignore_manual_transaction,
+    mark_manual_transaction_duplicate,
+    restore_manual_transaction,
+    update_manual_transaction,
 )
 from app.models import RawSmsMessage
 from app.review_queue import (
@@ -133,6 +145,7 @@ async def require_inbound_sms_secret(
             request.url.path in protected_paths
             or request.url.path.startswith("/api/review-queue")
             or request.url.path.startswith("/api/ledger-transactions")
+            or request.url.path.startswith("/api/manual-transactions")
             or request.url.path.startswith("/api/export")
             or request.url.path.startswith("/api/accounts")
             or request.url.path.startswith("/api/categories")
@@ -297,6 +310,59 @@ def ledger_transaction_correct(
     return correct_ledger_transaction(db_session, transaction_id, payload)
 
 
+@app.post("/api/manual-transactions", status_code=status.HTTP_201_CREATED)
+def manual_transactions_create(
+    payload: ManualTransactionCreatePayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return create_manual_transaction(db_session, payload)
+
+
+@app.patch("/api/manual-transactions/{transaction_id}")
+def manual_transactions_update(
+    transaction_id: str,
+    payload: ManualTransactionUpdatePayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return update_manual_transaction(db_session, transaction_id, payload)
+
+
+@app.post("/api/manual-transactions/{transaction_id}/ignore")
+def manual_transactions_ignore(
+    transaction_id: str,
+    payload: ManualTransactionActionPayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return ignore_manual_transaction(db_session, transaction_id, payload)
+
+
+@app.post("/api/manual-transactions/{transaction_id}/mark-duplicate")
+def manual_transactions_mark_duplicate(
+    transaction_id: str,
+    payload: ManualTransactionActionPayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return mark_manual_transaction_duplicate(db_session, transaction_id, payload)
+
+
+@app.delete("/api/manual-transactions/{transaction_id}")
+def manual_transactions_delete(
+    transaction_id: str,
+    payload: ManualTransactionActionPayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return delete_manual_transaction(db_session, transaction_id, payload)
+
+
+@app.post("/api/manual-transactions/{transaction_id}/restore")
+def manual_transactions_restore(
+    transaction_id: str,
+    payload: ManualTransactionActionPayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return restore_manual_transaction(db_session, transaction_id, payload)
+
+
 @app.get("/api/export/json")
 def export_json_data(
     db_session: Annotated[Session, Depends(get_db_session)],
@@ -333,6 +399,15 @@ def accounts_update(
     db_session: Annotated[Session, Depends(get_db_session)],
 ) -> dict[str, object]:
     return update_account(db_session, account_id, payload)
+
+
+@app.post("/api/accounts/{account_id}/cash-balance")
+def accounts_update_cash_balance(
+    account_id: str,
+    payload: CashBalanceUpdatePayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return update_cash_balance(db_session, account_id, payload)
 
 
 @app.get("/api/categories", response_model=CategoryListResponse)

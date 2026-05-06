@@ -371,6 +371,87 @@ Account updates create `account_updated` audit events with before/after values.
 Category deletes are soft deletes. Deleting a category used by active ledger
 transactions returns `409`.
 
+## Manual Transaction Development Contract
+
+Sprint 13 adds authenticated manual transaction endpoints using the same shared
+secret header:
+
+```text
+POST /api/manual-transactions
+PATCH /api/manual-transactions/{transaction_id}
+POST /api/manual-transactions/{transaction_id}/ignore
+POST /api/manual-transactions/{transaction_id}/mark-duplicate
+DELETE /api/manual-transactions/{transaction_id}
+POST /api/manual-transactions/{transaction_id}/restore
+```
+
+Create payload:
+
+```json
+{
+  "transaction_date": "2026-05-06",
+  "amount": "125.50",
+  "transaction_type": "debit",
+  "purpose": "expense",
+  "category": "food_delivery",
+  "merchant_raw": "FAKE_MANUAL_FOOD",
+  "merchant_canonical": "Fake Manual Food",
+  "account_id": "acct_cash_wallet",
+  "reason": "fake manual entry"
+}
+```
+
+Manual transactions are stored as `LedgerTransaction` rows with `source:
+manual`, `review_status: reviewed`, `duplicate_status: unique`, and
+`ledger_status: included`. Manual create, update, ignore, duplicate, delete, and
+restore actions create audit events. Deletes are soft deletes. The manual
+transaction endpoints reject SMS-derived ledger transactions.
+
+Update payload:
+
+```json
+{
+  "updates": {
+    "amount": "130.00",
+    "merchant_canonical": "Corrected Fake Manual Food"
+  },
+  "reason": "fake correction"
+}
+```
+
+Supported update fields are `transaction_date`, `amount`, `transaction_type`,
+`purpose`, `category`, `merchant_raw`, `merchant_canonical`, and `account_id`.
+Unknown accounts and deleted categories return `422`.
+
+## Cash Tracking Development Contract
+
+Sprint 14 adds an authenticated cash balance update endpoint:
+
+```text
+POST /api/accounts/{account_id}/cash-balance
+```
+
+Payload:
+
+```json
+{
+  "reported_balance": "4200.00",
+  "reported_on": "2026-05-06",
+  "record_difference_as_adjustment": true,
+  "reason": "fake cash count"
+}
+```
+
+The endpoint only accepts accounts with `account_type: cash`. It compares the
+stored expected cash balance with the reported balance, updates
+`current_balance` and `last_manual_update`, and creates a `cash_balance_updated`
+audit event.
+
+When `record_difference_as_adjustment` is true and the difference is non-zero,
+the endpoint creates an auditable manual `cash_adjustment` transaction. A cash
+shortfall is categorized as `cash_spend`; a surplus is categorized as
+`cash_surplus`. Zero-difference updates do not create adjustment transactions.
+
 ## Selected Android Forwarder Pilot
 
 Sprint 3 uses `bogkonstantin/android_income_sms_gateway_webhook` as the first
