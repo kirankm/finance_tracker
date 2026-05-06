@@ -21,7 +21,7 @@ Sprint 7: Duplicate Detection
 
 ## Current Focus
 
-Review Sprint 8 ledger sanity checks implementation; CI still needs to run.
+Review and merge Sprint 8 ledger sanity checks PR after CI.
 
 ## Current Branch
 

@@ -111,4 +111,4 @@ Sprint plan created on 2026-05-06. Implementation continued after the plan was r
 - Built the Docker app image after code and test edits.
 - Recorded Decision 0013 for storing ledger sanity decisions in promotion metadata.
 - Updated the risk register for available-balance limitations and partial mitigation of mismatch logic risk.
-- CI has not run yet.
+- GitHub Actions passed on PR #7 after the Sprint 8 implementation was pushed.
