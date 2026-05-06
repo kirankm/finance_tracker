@@ -6,7 +6,7 @@ Sprint 12: Account and Category Management
 
 ## Sprint Status
 
-review
+done
 
 Allowed values:
 - planning
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 11: Import, Export, Backup, and Real-Use Readiness
+Sprint 12: Account and Category Management
 
 ## Current Focus
 
-Review Sprint 10 through Sprint 12 stacked implementation.
+Plan Sprint 13 manual transaction management.
 
 ## Current Branch
 
-`sprint-10-minimal-review-ui`
+`main`
 
 ## Open Blockers
 
@@ -52,3 +52,7 @@ passed on PR #7.
 
 Sprint 9 corrections and rule learning foundation implementation and local QA
 are complete; CI passed and PR #8 was merged to `main`.
+
+Sprint 10 minimal review UI, Sprint 11 export readiness, and Sprint 12
+account/category management implementation and local QA are complete; CI passed
+and PR #9 was merged to `main`.
