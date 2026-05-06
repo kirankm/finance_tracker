@@ -2,11 +2,11 @@
 
 ## Current Sprint
 
-Sprint 9: Corrections and Rule Learning Foundation
+Sprint 10: Minimal Review UI
 
 ## Sprint Status
 
-done
+review
 
 Allowed values:
 - planning
@@ -21,11 +21,11 @@ Sprint 9: Corrections and Rule Learning Foundation
 
 ## Current Focus
 
-Plan Sprint 10 minimal review UI.
+Complete Sprint 10 minimal review UI local checks and continue to Sprint 11.
 
 ## Current Branch
 
-`main`
+`sprint-10-minimal-review-ui`
 
 ## Open Blockers
 

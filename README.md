@@ -44,6 +44,15 @@ Run the app locally:
 uvicorn app.main:app --reload
 ```
 
+Open the minimal local review UI at:
+
+```text
+http://localhost:8000
+```
+
+The UI asks for the same `X-Inbound-SMS-Secret` used by the API before loading
+review data or sending review, correction, and promotion actions.
+
 Run tests:
 
 ```bash

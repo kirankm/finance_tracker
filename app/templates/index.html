@@ -3,71 +3,460 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ app_name }}</title>
+    <title>{{ app_name }} Review Queue</title>
     <style>
       :root {
         color-scheme: light;
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #f7f8fa;
-        color: #20242a;
+        background: #f5f7f9;
+        color: #1f2933;
+      }
+
+      * {
+        box-sizing: border-box;
       }
 
       body {
         margin: 0;
       }
 
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        min-height: 36px;
+        border: 1px solid #1f5eff;
+        border-radius: 6px;
+        background: #1f5eff;
+        color: #fff;
+        cursor: pointer;
+        font-weight: 700;
+        padding: 8px 12px;
+      }
+
+      button.secondary {
+        border-color: #a7b0bd;
+        background: #fff;
+        color: #26313f;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        border: 1px solid #c7d0dd;
+        border-radius: 6px;
+        background: #fff;
+        color: #1f2933;
+        min-height: 36px;
+        padding: 8px 10px;
+      }
+
+      textarea {
+        min-height: 84px;
+        resize: vertical;
+      }
+
       main {
-        box-sizing: border-box;
         min-height: 100vh;
-        padding: 48px 24px;
+        padding: 20px;
       }
 
       .shell {
+        display: grid;
+        grid-template-columns: minmax(280px, 380px) minmax(0, 1fr);
+        gap: 16px;
         margin: 0 auto;
-        max-width: 960px;
+        max-width: 1280px;
+      }
+
+      .topbar {
+        grid-column: 1 / -1;
+        align-items: end;
+        display: grid;
+        grid-template-columns: minmax(220px, 1fr) minmax(240px, 420px) auto;
+        gap: 12px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        letter-spacing: 0;
+        margin: 0;
       }
 
       h1 {
-        margin: 0 0 12px;
-        font-size: clamp(2rem, 7vw, 4.5rem);
-        line-height: 1;
-        letter-spacing: 0;
+        font-size: 1.7rem;
       }
 
-      p {
-        margin: 0;
-        max-width: 680px;
-        color: #4b5563;
-        font-size: 1.125rem;
-        line-height: 1.6;
+      h2 {
+        font-size: 1rem;
       }
 
-      .status {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 28px;
-        color: #146c43;
-        font-size: 0.875rem;
+      h3 {
+        font-size: 0.9rem;
+      }
+
+      label,
+      .label {
+        color: #546171;
+        display: block;
+        font-size: 0.78rem;
         font-weight: 700;
+        margin-bottom: 5px;
         text-transform: uppercase;
       }
 
-      .dot {
-        width: 10px;
-        height: 10px;
+      .panel,
+      .queue-item {
+        border: 1px solid #d7dee8;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .panel {
+        min-width: 0;
+        padding: 14px;
+      }
+
+      .queue {
+        display: grid;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .queue-item {
+        color: #1f2933;
+        display: grid;
+        gap: 6px;
+        padding: 10px;
+        text-align: left;
+      }
+
+      .queue-item.active {
+        border-color: #1f5eff;
+        box-shadow: 0 0 0 2px rgba(31, 94, 255, 0.14);
+      }
+
+      .grid {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .field,
+      .metadata,
+      pre {
+        min-width: 0;
+        border: 1px solid #e2e7ef;
+        border-radius: 6px;
+        background: #f9fafc;
+        padding: 8px;
+      }
+
+      .value {
+        overflow-wrap: anywhere;
+      }
+
+      pre {
+        overflow: auto;
+        white-space: pre-wrap;
+      }
+
+      .muted {
+        color: #607083;
+      }
+
+      .status {
         border-radius: 999px;
-        background: #198754;
+        background: #eef3f8;
+        color: #314054;
+        display: inline-flex;
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 4px 8px;
+      }
+
+      .message {
+        min-height: 22px;
+      }
+
+      .error {
+        color: #b42318;
+      }
+
+      .success {
+        color: #146c43;
+      }
+
+      .stack {
+        display: grid;
+        gap: 12px;
+      }
+
+      @media (max-width: 820px) {
+        main {
+          padding: 12px;
+        }
+
+        .shell,
+        .topbar,
+        .grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
   <body>
-    <main>
+    <main data-testid="review-shell">
       <div class="shell">
-        <div class="status"><span class="dot"></span>{{ environment }}</div>
-        <h1>{{ app_name }}</h1>
-        <p>Foundation app is running. Sprint 0 keeps this intentionally small while the ingestion, parser, ledger, and review workflows are built in later sprints.</p>
+        <section class="topbar">
+          <div>
+            <div class="label">{{ environment }}</div>
+            <h1>Review Queue</h1>
+          </div>
+          <label>
+            X-Inbound-SMS-Secret
+            <input id="secret" type="password" autocomplete="off" placeholder="Shared secret">
+          </label>
+          <button id="loadQueue" type="button">Load</button>
+        </section>
+
+        <section class="panel">
+          <div class="row">
+            <h2>Pending Items</h2>
+            <span id="queueCount" class="status">0</span>
+          </div>
+          <div id="queueMessage" class="message muted"></div>
+          <div id="queueList" class="queue" data-testid="queue-list"></div>
+        </section>
+
+        <section class="panel stack" data-testid="detail-panel">
+          <div>
+            <h2>Selected Item</h2>
+            <div id="detailMessage" class="message muted">Select a pending item.</div>
+          </div>
+
+          <div id="candidateFields" class="grid"></div>
+
+          <section>
+            <h3>Correction</h3>
+            <div class="grid">
+              <label>merchant_canonical<input id="merchant_canonical"></label>
+              <label>category<input id="category"></label>
+              <label>purpose<input id="purpose"></label>
+              <label>account_id<input id="account_id"></label>
+              <label>amount<input id="amount"></label>
+              <label>transaction_date<input id="transaction_date"></label>
+              <label>transaction_type<input id="transaction_type"></label>
+            </div>
+            <label>Reason<textarea id="correctionReason"></textarea></label>
+            <div class="row">
+              <button id="saveCorrection" type="button">Save Correction</button>
+              <button id="markReviewed" type="button" class="secondary">Mark Reviewed</button>
+              <button id="promote" type="button">Promote</button>
+            </div>
+          </section>
+
+          <section>
+            <h3>Raw SMS</h3>
+            <pre id="rawBody"></pre>
+          </section>
+
+          <section>
+            <h3>Metadata</h3>
+            <pre id="metadata"></pre>
+          </section>
+        </section>
       </div>
     </main>
+
+    <script>
+      const state = { items: [], selectedId: null };
+      const fields = [
+        "amount",
+        "transaction_date",
+        "transaction_type",
+        "purpose",
+        "category",
+        "merchant_raw",
+        "merchant_canonical",
+        "account_id",
+        "duplicate_status",
+        "ledger_status",
+        "ledger_sanity_status"
+      ];
+      const correctionFields = [
+        "merchant_canonical",
+        "category",
+        "purpose",
+        "account_id",
+        "amount",
+        "transaction_date",
+        "transaction_type"
+      ];
+
+      function secretHeaders() {
+        return { "X-Inbound-SMS-Secret": document.querySelector("#secret").value };
+      }
+
+      function jsonHeaders() {
+        return { ...secretHeaders(), "Content-Type": "application/json" };
+      }
+
+      function show(id, message, kind = "muted") {
+        const node = document.querySelector(id);
+        node.className = `message ${kind}`;
+        node.textContent = message;
+      }
+
+      async function api(path, options = {}) {
+        const response = await fetch(path, options);
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.detail || `Request failed: ${response.status}`);
+        }
+        return payload;
+      }
+
+      function renderList() {
+        const list = document.querySelector("#queueList");
+        document.querySelector("#queueCount").textContent = String(state.items.length);
+        list.replaceChildren();
+        state.items.forEach((item) => {
+          const candidate = item.candidate || {};
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `queue-item ${item.raw_sms_id === state.selectedId ? "active" : ""}`;
+          button.innerHTML = `
+            <strong>${candidate.merchant_canonical || candidate.merchant_raw || item.sender}</strong>
+            <span>${candidate.amount || "-"} · ${candidate.transaction_date || "-"} · ${candidate.review_status || "-"}</span>
+            <span class="muted">${item.sender} · ${item.received_at}</span>
+          `;
+          button.addEventListener("click", () => selectItem(item.raw_sms_id));
+          list.appendChild(button);
+        });
+      }
+
+      function renderDetail(item, detail = null) {
+        const candidate = item.candidate || {};
+        const fieldContainer = document.querySelector("#candidateFields");
+        fieldContainer.replaceChildren();
+        fields.forEach((field) => {
+          const node = document.createElement("div");
+          node.className = "field";
+          node.innerHTML = `<div class="label">${field}</div><div class="value">${candidate[field] ?? "-"}</div>`;
+          fieldContainer.appendChild(node);
+        });
+        correctionFields.forEach((field) => {
+          document.querySelector(`#${field}`).value = candidate[field] ?? "";
+        });
+        document.querySelector("#rawBody").textContent = detail ? detail.body : "";
+        document.querySelector("#metadata").textContent = JSON.stringify(candidate, null, 2);
+      }
+
+      async function loadQueue() {
+        try {
+          const payload = await api("/api/review-queue", { headers: secretHeaders() });
+          state.items = payload.items || [];
+          state.selectedId = null;
+          renderList();
+          show("#queueMessage", state.items.length ? "Loaded pending candidates." : "No pending candidates.", "success");
+          show("#detailMessage", "Select a pending item.");
+          document.querySelector("#candidateFields").replaceChildren();
+          document.querySelector("#rawBody").textContent = "";
+          document.querySelector("#metadata").textContent = "";
+        } catch (error) {
+          show("#queueMessage", error.message, "error");
+        }
+      }
+
+      async function selectItem(rawSmsId) {
+        state.selectedId = rawSmsId;
+        renderList();
+        const item = state.items.find((candidate) => candidate.raw_sms_id === rawSmsId);
+        try {
+          const detail = await api(`/api/review-queue/${rawSmsId}`, { headers: secretHeaders() });
+          renderDetail(item || detail, detail);
+          show("#detailMessage", "Detail loaded.", "success");
+        } catch (error) {
+          show("#detailMessage", error.message, "error");
+        }
+      }
+
+      async function saveCorrection() {
+        if (!state.selectedId) return;
+        const updates = {};
+        correctionFields.forEach((field) => {
+          const value = document.querySelector(`#${field}`).value.trim();
+          if (value) updates[field] = value;
+        });
+        try {
+          const detail = await api(`/api/review-queue/${state.selectedId}/corrections`, {
+            method: "PATCH",
+            headers: jsonHeaders(),
+            body: JSON.stringify({
+              updates,
+              reason: document.querySelector("#correctionReason").value || null
+            })
+          });
+          const index = state.items.findIndex((item) => item.raw_sms_id === state.selectedId);
+          if (index >= 0) state.items[index] = detail;
+          renderList();
+          renderDetail(detail, detail);
+          show("#detailMessage", "Correction saved.", "success");
+        } catch (error) {
+          show("#detailMessage", error.message, "error");
+        }
+      }
+
+      async function markReviewed() {
+        if (!state.selectedId) return;
+        try {
+          const detail = await api(`/api/review-queue/${state.selectedId}/review`, {
+            method: "POST",
+            headers: jsonHeaders(),
+            body: JSON.stringify({ decision: "reviewed", reason: "reviewed from minimal UI" })
+          });
+          renderDetail(detail, detail);
+          show("#detailMessage", "Marked reviewed.", "success");
+        } catch (error) {
+          show("#detailMessage", error.message, "error");
+        }
+      }
+
+      async function promote() {
+        if (!state.selectedId) return;
+        try {
+          const payload = await api(`/api/review-queue/${state.selectedId}/promote`, {
+            method: "POST",
+            headers: jsonHeaders(),
+            body: JSON.stringify({ reason: "promoted from minimal UI" })
+          });
+          show(
+            "#detailMessage",
+            `Promoted ${payload.ledger_transaction_id}; duplicate_status=${payload.duplicate_status}; ledger_status=${payload.ledger_status}; ledger_sanity_status=${payload.ledger_sanity_status}`,
+            "success"
+          );
+        } catch (error) {
+          show("#detailMessage", error.message, "error");
+        }
+      }
+
+      document.querySelector("#loadQueue").addEventListener("click", loadQueue);
+      document.querySelector("#saveCorrection").addEventListener("click", saveCorrection);
+      document.querySelector("#markReviewed").addEventListener("click", markReviewed);
+      document.querySelector("#promote").addEventListener("click", promote);
+    </script>
   </body>
 </html>
