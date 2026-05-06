@@ -6,7 +6,7 @@ Sprint 9: Corrections and Rule Learning Foundation
 
 ## Sprint Status
 
-review
+done
 
 Allowed values:
 - planning
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 8: Ledger Sanity Checks
+Sprint 9: Corrections and Rule Learning Foundation
 
 ## Current Focus
 
-Review Sprint 9 corrections and rule learning foundation implementation. GitHub Actions passed on PR #8.
+Plan Sprint 10 minimal review UI.
 
 ## Current Branch
 
-`sprint-09-corrections-rule-learning`
+`main`
 
 ## Open Blockers
 
@@ -49,3 +49,6 @@ passed and PR #6 was merged to `main`.
 
 Sprint 8 ledger sanity checks implementation and local QA are complete; CI
 passed on PR #7.
+
+Sprint 9 corrections and rule learning foundation implementation and local QA
+are complete; CI passed and PR #8 was merged to `main`.
