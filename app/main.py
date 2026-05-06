@@ -23,7 +23,7 @@ from app.corrections import (
     correct_review_candidate,
 )
 from app.database import get_db_session
-from app.export import export_json, export_ledger_csv
+from app.export import export_json, export_ledger_csv, validate_import_json
 from app.insights import (
     InsightActionPayload,
     InsightsParams,
@@ -174,6 +174,7 @@ async def require_inbound_sms_secret(
             or request.url.path.startswith("/api/rule-candidates")
             or request.url.path.startswith("/api/user-rules")
             or request.url.path.startswith("/api/export")
+            or request.url.path.startswith("/api/import")
             or request.url.path.startswith("/api/accounts")
             or request.url.path.startswith("/api/categories")
         )
@@ -548,8 +549,14 @@ def manual_transactions_restore(
 @app.get("/api/export/json")
 def export_json_data(
     db_session: Annotated[Session, Depends(get_db_session)],
+    include_raw_sms_body: bool = False,
 ) -> dict[str, object]:
-    return export_json(db_session)
+    return export_json(db_session, include_raw_sms_body=include_raw_sms_body)
+
+
+@app.post("/api/import/json/validate")
+def import_json_validate(payload: dict[str, object]) -> dict[str, object]:
+    return validate_import_json(payload)
 
 
 @app.get("/api/export/ledger-transactions.csv")

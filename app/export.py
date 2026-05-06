@@ -4,16 +4,28 @@ from decimal import Decimal
 from io import StringIO
 from typing import Any
 
+from fastapi import HTTPException
 from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Account, AuditEvent, Category, LedgerTransaction, RawSmsMessage
+from app.models import Account, AuditEvent, Category, LedgerTransaction, RawSmsMessage, UserRule
+
+SUPPORTED_EXPORT_FORMAT_VERSIONS = {1, 2}
+CURRENT_EXPORT_FORMAT_VERSION = 2
+REQUIRED_IMPORT_SECTIONS = (
+    "accounts",
+    "ledger_transactions",
+    "raw_sms_messages",
+    "categories",
+    "audit_events",
+    "user_rules",
+)
 
 
-def export_json(db_session: Session) -> dict[str, Any]:
+def export_json(db_session: Session, *, include_raw_sms_body: bool = False) -> dict[str, Any]:
     return {
-        "format_version": 1,
+        "format_version": CURRENT_EXPORT_FORMAT_VERSION,
         "accounts": [
             account_to_dict(account)
             for account in db_session.scalars(select(Account).order_by(Account.id))
@@ -28,7 +40,7 @@ def export_json(db_session: Session) -> dict[str, Any]:
             )
         ],
         "raw_sms_messages": [
-            raw_sms_to_metadata(raw_sms)
+            raw_sms_to_metadata(raw_sms, include_body=include_raw_sms_body)
             for raw_sms in db_session.scalars(
                 select(RawSmsMessage).order_by(RawSmsMessage.received_at, RawSmsMessage.id)
             )
@@ -41,6 +53,12 @@ def export_json(db_session: Session) -> dict[str, Any]:
             audit_event_to_dict(audit_event)
             for audit_event in db_session.scalars(
                 select(AuditEvent).order_by(AuditEvent.created_at, AuditEvent.id)
+            )
+        ],
+        "user_rules": [
+            user_rule_to_dict(rule)
+            for rule in db_session.scalars(
+                select(UserRule).order_by(UserRule.priority, UserRule.id)
             )
         ],
     }
@@ -124,8 +142,8 @@ def transaction_to_dict(transaction: LedgerTransaction) -> dict[str, Any]:
     }
 
 
-def raw_sms_to_metadata(raw_sms: RawSmsMessage) -> dict[str, Any]:
-    return {
+def raw_sms_to_metadata(raw_sms: RawSmsMessage, *, include_body: bool = False) -> dict[str, Any]:
+    row = {
         "id": raw_sms.id,
         "external_message_id": raw_sms.external_message_id,
         "sender": raw_sms.sender,
@@ -133,10 +151,13 @@ def raw_sms_to_metadata(raw_sms: RawSmsMessage) -> dict[str, Any]:
         "source": raw_sms.source,
         "processing_status": raw_sms.processing_status,
         "parser_output": raw_sms.parser_output,
-        "body_exported": False,
+        "body_exported": include_body,
         "created_at": serialize(raw_sms.created_at),
         "updated_at": serialize(raw_sms.updated_at),
     }
+    if include_body:
+        row["body"] = raw_sms.body
+    return row
 
 
 def category_to_dict(category: Category) -> dict[str, Any]:
@@ -162,6 +183,73 @@ def audit_event_to_dict(audit_event: AuditEvent) -> dict[str, Any]:
         "reason": audit_event.reason,
         "created_at": serialize(audit_event.created_at),
         "updated_at": serialize(audit_event.updated_at),
+    }
+
+
+def user_rule_to_dict(rule: UserRule) -> dict[str, Any]:
+    return {
+        "id": rule.id,
+        "name": rule.name,
+        "priority": rule.priority,
+        "match_merchant_raw": rule.match_merchant_raw,
+        "match_account_clue": rule.match_account_clue,
+        "set_account_id": rule.set_account_id,
+        "set_merchant_canonical": rule.set_merchant_canonical,
+        "set_category": rule.set_category,
+        "set_purpose": rule.set_purpose,
+        "enabled": rule.enabled,
+        "source_metadata": rule.source_metadata,
+        "created_at": serialize(rule.created_at),
+        "updated_at": serialize(rule.updated_at),
+    }
+
+
+def validate_import_json(payload: dict[str, Any]) -> dict[str, Any]:
+    version = payload.get("format_version")
+    if version not in SUPPORTED_EXPORT_FORMAT_VERSIONS:
+        raise HTTPException(status_code=422, detail="unsupported export format_version")
+
+    required_sections: tuple[str, ...] = REQUIRED_IMPORT_SECTIONS
+    if version == 1:
+        required_sections = tuple(
+            section for section in REQUIRED_IMPORT_SECTIONS if section != "user_rules"
+        )
+    missing = [
+        section
+        for section in required_sections
+        if section not in payload or not isinstance(payload.get(section), list)
+    ]
+    if missing:
+        raise HTTPException(
+            status_code=422,
+            detail=f"export JSON is missing required sections: {', '.join(missing)}",
+        )
+
+    raw_sms_messages = payload.get("raw_sms_messages", [])
+    raw_sms_bodies_included = sum(
+        1
+        for raw_sms in raw_sms_messages
+        if isinstance(raw_sms, dict)
+        and raw_sms.get("body_exported") is True
+        and "body" in raw_sms
+    )
+    warnings = []
+    if version == 1:
+        warnings.append("format_version 1 does not include user_rules")
+
+    return {
+        "valid": True,
+        "format_version": version,
+        "counts": {
+            "accounts": len(payload.get("accounts", [])),
+            "ledger_transactions": len(payload.get("ledger_transactions", [])),
+            "raw_sms_messages": len(raw_sms_messages),
+            "categories": len(payload.get("categories", [])),
+            "audit_events": len(payload.get("audit_events", [])),
+            "user_rules": len(payload.get("user_rules", [])),
+        },
+        "raw_sms_bodies_included": raw_sms_bodies_included,
+        "warnings": warnings,
     }
 
 

@@ -2,7 +2,7 @@
 
 ## Current Sprint
 
-Sprint 18: User-Approved Rules
+Sprint 19: Import and Export Completion
 
 ## Sprint Status
 
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 18: User-Approved Rules
+Sprint 19: Import and Export Completion
 
 ## Current Focus
 
-Prepare Sprint 19 import/export completion.
+Prepare Sprint 20 production pilot hardening.
 
 ## Current Branch
 
-`sprint-18-user-approved-rules`
+`sprint-19-import-export-completion`
 
 ## Open Blockers
 
@@ -70,3 +70,5 @@ Sprint 17 deterministic insights screen implementation and local QA are
 complete.
 
 Sprint 18 user-approved rules implementation and local QA are complete.
+
+Sprint 19 import/export completion implementation and local QA are complete.

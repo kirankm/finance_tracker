@@ -19,7 +19,7 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 17 insights screen is merged to `main`. The app has authenticated SMS
+Sprint 18 user-approved rules is merged to `main`. The app has authenticated SMS
 ingestion, the selected Android forwarder adapter, deterministic fake-rule
 enrichment for account mapping, merchant normalization, and category assignment,
 an authenticated backend review queue for stored SMS transaction candidates, an
@@ -27,7 +27,7 @@ authenticated path for promoting reviewed fake candidates into ledger
 transactions with deterministic duplicate and ledger sanity checks, account and
 category management, manual transaction workflows, cash balance updates, and
 structured ledger search/filtering, deterministic analysis summaries, and
-deterministic insights.
+deterministic insights, and user-approved rules.
 
 ## Development Commands
 
@@ -342,8 +342,18 @@ Export structured JSON:
 GET /api/export/json
 ```
 
-The JSON export includes accounts, ledger transactions, raw SMS metadata, and
-categories, and audit events. It does not include raw SMS bodies by default.
+The JSON export uses `format_version: 2` and includes accounts, ledger
+transactions, raw SMS metadata, categories, audit events, and user-approved
+rules. It does not include raw SMS bodies by default.
+
+Raw SMS body export is explicit:
+
+```text
+GET /api/export/json?include_raw_sms_body=true
+```
+
+When this flag is used, raw SMS rows include `body_exported: true` and `body`.
+Without the flag, raw SMS rows include `body_exported: false` and omit `body`.
 
 Export ledger CSV:
 
@@ -351,8 +361,15 @@ Export ledger CSV:
 GET /api/export/ledger-transactions.csv
 ```
 
-Raw SMS body bulk export is intentionally deferred because it needs a separate
-privacy decision and user-facing warning.
+Validate exported JSON before restore/import:
+
+```text
+POST /api/import/json/validate
+```
+
+The validator supports export `format_version` 1 and 2. Version 1 is accepted
+with a warning because it predates user-approved rules. Validation checks shape
+and reports section counts; it does not write to the live database.
 
 ## Account and Category Management Development Contract
 

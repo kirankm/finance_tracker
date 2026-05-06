@@ -10,7 +10,7 @@ from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db_session
 from app.main import app
-from app.models import Account, AuditEvent, LedgerTransaction, RawSmsMessage
+from app.models import Account, AuditEvent, LedgerTransaction, RawSmsMessage, UserRule
 
 AUTH_HEADERS = {"X-Inbound-SMS-Secret": "change-me-in-development"}
 
@@ -80,7 +80,17 @@ def seed_export_data(session: Session) -> None:
         field_changes={"transaction_id": "txn_export"},
         reason="fake export seed",
     )
-    session.add_all([account, raw_sms, transaction, audit_event])
+    user_rule = UserRule(
+        id="rule_export",
+        name="Fake Export Rule",
+        priority=10,
+        match_merchant_raw="MERCHANT_FOOD_1",
+        set_merchant_canonical="Merchant Food 1",
+        set_category="food_delivery",
+        enabled=True,
+        source_metadata={"fixture": "export"},
+    )
+    session.add_all([account, raw_sms, transaction, audit_event, user_rule])
     session.commit()
 
 
@@ -100,14 +110,34 @@ def test_json_export_includes_structured_data_without_raw_sms_body() -> None:
 
     assert response.status_code == 200
     payload = response.json()
-    assert payload["format_version"] == 1
+    assert payload["format_version"] == 2
     assert payload["accounts"][0]["id"] == "acct_bank_1"
     assert payload["ledger_transactions"][0]["id"] == "txn_export"
     assert payload["audit_events"][0]["id"] == "audit_export"
+    assert payload["user_rules"][0]["id"] == "rule_export"
     assert payload["raw_sms_messages"][0]["id"] == "raw_sms_export"
     assert payload["raw_sms_messages"][0]["body_exported"] is False
     assert "body" not in payload["raw_sms_messages"][0]
     assert "fake private sms body" not in response.text
+
+
+def test_json_export_includes_raw_sms_body_only_when_explicitly_requested() -> None:
+    with make_test_client() as (client, session):
+        seed_export_data(session)
+
+        response = client.get(
+            "/api/export/json",
+            headers=AUTH_HEADERS,
+            params={"include_raw_sms_body": "true"},
+        )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["raw_sms_messages"][0]["body_exported"] is True
+    assert (
+        payload["raw_sms_messages"][0]["body"]
+        == "fake private sms body must not be exported broadly"
+    )
 
 
 def test_ledger_csv_export_requires_shared_secret() -> None:
