@@ -128,3 +128,22 @@ def test_ledger_csv_export_includes_headers_and_rows() -> None:
     assert response.headers["content-type"].startswith("text/csv")
     assert "id,transaction_date,amount,transaction_type" in response.text
     assert "txn_export,2026-05-04,480.00,debit" in response.text
+
+
+def test_ledger_csv_export_escapes_spreadsheet_formula_values() -> None:
+    with make_test_client() as (client, session):
+        seed_export_data(session)
+        transaction = session.get(LedgerTransaction, "txn_export")
+        assert transaction is not None
+        transaction.merchant_raw = "=CMD"
+        transaction.merchant_canonical = "+Merchant"
+        transaction.category = "@category"
+        session.add(transaction)
+        session.commit()
+
+        response = client.get("/api/export/ledger-transactions.csv", headers=AUTH_HEADERS)
+
+    assert response.status_code == 200
+    assert "'=CMD" in response.text
+    assert "'+Merchant" in response.text
+    assert "'@category" in response.text

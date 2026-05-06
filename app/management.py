@@ -129,8 +129,20 @@ def update_category(
     if category is None:
         raise HTTPException(status_code=404, detail="category not found")
     updates = payload.model_dump(exclude_unset=True)
+    changes: dict[str, dict[str, Any]] = {}
     for field_name, value in updates.items():
+        before = getattr(category, field_name)
         setattr(category, field_name, value)
+        changes[field_name] = {"before": serialize(before), "after": serialize(value)}
+    if changes:
+        db_session.add(
+            AuditEvent(
+                id=f"audit_{uuid4().hex}",
+                actor_type="user",
+                event_type="category_updated",
+                field_changes={"category_id": category.id, **changes},
+            )
+        )
     db_session.add(category)
     db_session.commit()
     db_session.refresh(category)
@@ -155,7 +167,21 @@ def delete_category(
             detail="category is used by active ledger transactions",
         )
     category.deleted_at = datetime.now(UTC)
+    changes = {
+        "category_id": category.id,
+        "deleted_at": {"before": None, "after": serialize(category.deleted_at)},
+        "deleted_reason": {"before": category.deleted_reason, "after": payload.reason},
+    }
     category.deleted_reason = payload.reason
+    db_session.add(
+        AuditEvent(
+            id=f"audit_{uuid4().hex}",
+            actor_type="user",
+            event_type="category_deleted",
+            field_changes=changes,
+            reason=payload.reason,
+        )
+    )
     db_session.add(category)
     db_session.commit()
     db_session.refresh(category)

@@ -282,7 +282,7 @@
     </main>
 
     <script>
-      const state = { items: [], selectedId: null };
+      const state = { items: [], selectedId: null, originalCorrectionValues: {} };
       const fields = [
         "amount",
         "transaction_date",
@@ -359,7 +359,9 @@
           fieldContainer.appendChild(node);
         });
         correctionFields.forEach((field) => {
-          document.querySelector(`#${field}`).value = candidate[field] ?? "";
+          const value = candidate[field] ?? "";
+          document.querySelector(`#${field}`).value = value;
+          state.originalCorrectionValues[field] = String(value);
         });
         document.querySelector("#rawBody").textContent = detail ? detail.body : "";
         document.querySelector("#metadata").textContent = JSON.stringify(candidate, null, 2);
@@ -399,7 +401,8 @@
         const updates = {};
         correctionFields.forEach((field) => {
           const value = document.querySelector(`#${field}`).value.trim();
-          if (value) updates[field] = value;
+          const originalValue = state.originalCorrectionValues[field] || "";
+          if (value && value !== originalValue) updates[field] = value;
         });
         try {
           const detail = await api(`/api/review-queue/${state.selectedId}/corrections`, {

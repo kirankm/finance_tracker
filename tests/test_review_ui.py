@@ -60,6 +60,15 @@ def test_review_ui_wires_existing_authenticated_api_actions() -> None:
     assert "ledger_sanity_status" in html
 
 
+def test_review_ui_tracks_original_values_and_submits_only_changed_corrections() -> None:
+    with make_test_client() as client:
+        response = client.get("/")
+
+    html = response.text
+    assert "originalCorrectionValues" in html
+    assert "value && value !== originalValue" in html
+
+
 def test_review_ui_keeps_raw_sms_in_detail_region_not_list_template() -> None:
     with make_test_client() as client:
         response = client.get("/")

@@ -74,7 +74,7 @@ def export_ledger_csv(db_session: Session) -> Response:
     ]
     writer = csv.DictWriter(output, fieldnames=fieldnames, extrasaction="ignore")
     writer.writeheader()
-    writer.writerows(rows)
+    writer.writerows(sanitize_csv_row(row) for row in rows)
     return Response(
         content=output.getvalue(),
         media_type="text/csv",
@@ -170,4 +170,16 @@ def serialize(value: Any) -> Any:
         return str(value)
     if isinstance(value, datetime | date):
         return value.isoformat()
+    return value
+
+
+def sanitize_csv_row(row: dict[str, Any]) -> dict[str, Any]:
+    return {key: sanitize_csv_cell(value) for key, value in row.items()}
+
+
+def sanitize_csv_cell(value: Any) -> Any:
+    if not isinstance(value, str):
+        return value
+    if value.startswith(("=", "+", "-", "@")):
+        return f"'{value}"
     return value

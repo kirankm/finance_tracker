@@ -94,7 +94,7 @@ def test_category_management_requires_shared_secret() -> None:
 
 
 def test_create_list_update_and_soft_delete_unused_category() -> None:
-    with make_test_client() as (client, _session):
+    with make_test_client() as (client, session):
         create_response = client.post(
             "/api/categories",
             headers=AUTH_HEADERS,
@@ -116,6 +116,11 @@ def test_create_list_update_and_soft_delete_unused_category() -> None:
             json={"reason": "fake cleanup"},
         )
         list_response = client.get("/api/categories?include_deleted=true", headers=AUTH_HEADERS)
+        audit_events = session.scalars(
+            select(AuditEvent).where(
+                AuditEvent.event_type.in_(["category_updated", "category_deleted"])
+            )
+        ).all()
 
     assert create_response.status_code == 201
     assert create_response.json()["intent_type"] == "committed"
@@ -124,6 +129,18 @@ def test_create_list_update_and_soft_delete_unused_category() -> None:
     assert delete_response.status_code == 200
     assert delete_response.json()["deleted_reason"] == "fake cleanup"
     assert list_response.json()["items"][0]["deleted_at"] is not None
+    assert [event.event_type for event in audit_events] == [
+        "category_updated",
+        "category_deleted",
+    ]
+    assert audit_events[0].field_changes["name"] == {
+        "before": "Groceries",
+        "after": "House Groceries",
+    }
+    assert audit_events[1].field_changes["deleted_reason"] == {
+        "before": None,
+        "after": "fake cleanup",
+    }
 
 
 def test_category_used_by_active_transaction_cannot_be_deleted() -> None:
