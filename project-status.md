@@ -2,7 +2,7 @@
 
 ## Current Sprint
 
-Sprint 15: Structured Search and Filters
+Sprint 16: Analysis Screen
 
 ## Sprint Status
 
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 15: Structured Search and Filters
+Sprint 16: Analysis Screen
 
 ## Current Focus
 
-Prepare Sprint 16 deterministic analysis screen.
+Prepare Sprint 17 deterministic insights screen.
 
 ## Current Branch
 
-`sprint-15-structured-search-filters`
+`sprint-16-analysis-screen`
 
 ## Open Blockers
 
@@ -61,4 +61,7 @@ Sprint 13 manual transaction management and Sprint 14 cash tracking
 implementation and local QA are complete; CI passed on PR #10.
 
 Sprint 15 structured search and filters implementation and local QA are
+complete.
+
+Sprint 16 deterministic analysis screen implementation and local QA are
 complete.
