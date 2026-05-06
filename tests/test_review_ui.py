@@ -141,3 +141,20 @@ def test_review_ui_exposes_insights_panel() -> None:
     assert "includeDismissedInsights" in insights_region
     assert "includeReviewedInsights" in insights_region
     assert "rawBody" not in insights_region
+
+
+def test_review_ui_exposes_rule_management_panel() -> None:
+    with make_test_client() as client:
+        response = client.get("/")
+
+    html = response.text
+    rules_region = html.split('data-testid="rules-panel"', maxsplit=1)[1].split(
+        "</section>", maxsplit=1
+    )[0]
+    assert "/api/rule-candidates" in html
+    assert "/api/user-rules" in html
+    assert "loadRuleCandidates" in rules_region
+    assert "loadUserRules" in rules_region
+    assert "ruleCandidatesList" in rules_region
+    assert "userRulesList" in rules_region
+    assert "rawBody" not in rules_region

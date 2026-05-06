@@ -2,7 +2,17 @@ from datetime import UTC, date, datetime
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import JSON, Boolean, Date, ForeignKey, Numeric, String, Text, UniqueConstraint
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Date,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.types import TypeDecorator
 
@@ -15,6 +25,7 @@ __all__ = [
     "Category",
     "LedgerTransaction",
     "RawSmsMessage",
+    "UserRule",
 ]
 
 
@@ -134,6 +145,22 @@ class RawSmsMessage(Base, TimestampMixin):
         back_populates="raw_sms_message",
         uselist=False,
     )
+
+
+class UserRule(Base, TimestampMixin):
+    __tablename__ = "user_rules"
+
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    name: Mapped[str] = mapped_column(String(160), nullable=False)
+    priority: Mapped[int] = mapped_column(Integer, default=10, nullable=False)
+    match_merchant_raw: Mapped[str | None] = mapped_column(Text, nullable=True)
+    match_account_clue: Mapped[str | None] = mapped_column(Text, nullable=True)
+    set_account_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    set_merchant_canonical: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    set_category: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    set_purpose: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    source_metadata: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict, nullable=False)
 
 
 class AuditEvent(Base, TimestampMixin):

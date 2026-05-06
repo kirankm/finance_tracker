@@ -2,7 +2,7 @@
 
 ## Current Sprint
 
-Sprint 17: Insights Screen
+Sprint 18: User-Approved Rules
 
 ## Sprint Status
 
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 17: Insights Screen
+Sprint 18: User-Approved Rules
 
 ## Current Focus
 
-Prepare Sprint 18 user-approved rules.
+Prepare Sprint 19 import/export completion.
 
 ## Current Branch
 
-`sprint-17-insights-screen`
+`sprint-18-user-approved-rules`
 
 ## Open Blockers
 
@@ -68,3 +68,5 @@ complete.
 
 Sprint 17 deterministic insights screen implementation and local QA are
 complete.
+
+Sprint 18 user-approved rules implementation and local QA are complete.
