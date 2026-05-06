@@ -19,12 +19,14 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 7 duplicate detection is merged to `main`. The app has authenticated SMS
+Sprint 14 cash tracking is merged to `main`. The app has authenticated SMS
 ingestion, the selected Android forwarder adapter, deterministic fake-rule
 enrichment for account mapping, merchant normalization, and category assignment,
-an authenticated backend review queue for stored SMS transaction candidates, and
-an authenticated path for promoting reviewed fake candidates into ledger
-transactions with deterministic duplicate detection.
+an authenticated backend review queue for stored SMS transaction candidates, an
+authenticated path for promoting reviewed fake candidates into ledger
+transactions with deterministic duplicate and ledger sanity checks, account and
+category management, manual transaction workflows, cash balance updates, and
+export/backup documentation.
 
 ## Development Commands
 
@@ -451,6 +453,49 @@ When `record_difference_as_adjustment` is true and the difference is non-zero,
 the endpoint creates an auditable manual `cash_adjustment` transaction. A cash
 shortfall is categorized as `cash_spend`; a surplus is categorized as
 `cash_surplus`. Zero-difference updates do not create adjustment transactions.
+
+## Ledger Search Development Contract
+
+Sprint 15 adds an authenticated structured ledger search endpoint:
+
+```text
+GET /api/ledger-transactions
+```
+
+Supported query parameters:
+
+```text
+id
+date_from
+date_to
+account_id
+transaction_type
+purpose
+category
+merchant
+amount_min
+amount_max
+review_status
+duplicate_status
+ledger_status
+source
+include_deleted
+sort_by
+sort_dir
+limit
+offset
+```
+
+`sort_by` supports `transaction_date`, `amount`, `created_at`, `updated_at`,
+`merchant`, and `account_id`. `limit` is bounded to 100. Soft-deleted
+transactions are hidden by default and visible when `include_deleted=true`.
+Ignored, duplicate, and ledger-excluded transactions can be found through their
+explicit status filters.
+
+Search responses include transaction fields, status fields, selected
+source/audit context, and audit event counts. They do not include raw SMS
+bodies; raw SMS body inspection remains limited to explicit review detail
+endpoints.
 
 ## Selected Android Forwarder Pilot
 

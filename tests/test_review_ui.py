@@ -82,3 +82,28 @@ def test_review_ui_keeps_raw_sms_in_detail_region_not_list_template() -> None:
     assert "Raw SMS" not in list_region
     assert "rawBody" in detail_region
     assert "Raw SMS" in detail_region
+
+
+def test_review_ui_exposes_structured_ledger_search_filters() -> None:
+    with make_test_client() as client:
+        response = client.get("/")
+
+    html = response.text
+    search_region = html.split('data-testid="ledger-search-panel"', maxsplit=1)[1].split(
+        "</section>", maxsplit=1
+    )[0]
+    assert "/api/ledger-transactions" in html
+    assert "ledgerDateFrom" in search_region
+    assert "ledgerDateTo" in search_region
+    assert "ledgerAccount" in search_region
+    assert "ledgerTransactionType" in search_region
+    assert "ledgerPurpose" in search_region
+    assert "ledgerCategory" in search_region
+    assert "ledgerMerchant" in search_region
+    assert "ledgerAmountMin" in search_region
+    assert "ledgerReviewStatus" in search_region
+    assert "ledgerDuplicateStatus" in search_region
+    assert "ledgerLedgerStatus" in search_region
+    assert "ledgerSource" in search_region
+    assert "ledgerIncludeDeleted" in search_region
+    assert "rawBody" not in search_region
