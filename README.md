@@ -384,6 +384,16 @@ development-default `INBOUND_SMS_SECRET` is reported as a blocker. Real SMS
 remains no-go until the Android forwarder fake-device validation and off-server
 backup gates in `docs/deployment/production-pilot-go-no-go.md` pass.
 
+## V1 Release Candidate
+
+Sprint 21 documents the V1 software release candidate in
+`docs/v1-release-candidate.md` and adds an end-to-end fake-data regression in
+`tests/test_v1_release_candidate_workflow.py`.
+
+The release candidate is suitable for fake-data and production-like pilot
+testing. Real personal SMS remains blocked until physical Android forwarder
+validation and the first encrypted off-server backup are complete.
+
 ## Account and Category Management Development Contract
 
 Sprint 12 adds authenticated management endpoints using the same shared secret

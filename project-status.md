@@ -2,7 +2,7 @@
 
 ## Current Sprint
 
-Sprint 20: Production Pilot Hardening
+Sprint 21: V1 Stabilization and Release Candidate
 
 ## Sprint Status
 
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 20: Production Pilot Hardening
+Sprint 21: V1 Stabilization and Release Candidate
 
 ## Current Focus
 
-Prepare Sprint 21 V1 stabilization and release candidate.
+Prepare V2 planning after real-SMS pilot gates are completed or explicitly replanned.
 
 ## Current Branch
 
-`sprint-20-production-pilot-hardening`
+`sprint-21-v1-stabilization-release-candidate`
 
 ## Open Blockers
 
@@ -73,3 +73,5 @@ Sprint 18 user-approved rules implementation and local QA are complete.
 Sprint 19 import/export completion implementation and local QA are complete.
 
 Sprint 20 production pilot hardening implementation and local QA are complete.
+
+Sprint 21 V1 release-candidate stabilization implementation and local QA are complete.
