@@ -2,7 +2,7 @@
 
 ## Current Sprint
 
-Sprint 19: Import and Export Completion
+Sprint 20: Production Pilot Hardening
 
 ## Sprint Status
 
@@ -17,22 +17,21 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 19: Import and Export Completion
+Sprint 20: Production Pilot Hardening
 
 ## Current Focus
 
-Prepare Sprint 20 production pilot hardening.
+Prepare Sprint 21 V1 stabilization and release candidate.
 
 ## Current Branch
 
-`sprint-19-import-export-completion`
+`sprint-20-production-pilot-hardening`
 
 ## Open Blockers
 
-- Selected Android forwarder still needs fake-device setup validation before real SMS ingestion.
+- Real personal SMS remains no-go until physical Android fake-device forwarding validation passes.
 - Selected Android forwarder header support for `X-Inbound-SMS-Secret` still needs validation on device.
-- Host Python local checks need `python3.12-venv` and `python3-pip`; Docker checks pass.
-- Backups are documented and smoke-tested locally; off-server backup storage still needs to be chosen before relying on real data.
+- At least one encrypted off-server backup copy must be created before accepting real SMS.
 
 ## Notes
 
@@ -72,3 +71,5 @@ complete.
 Sprint 18 user-approved rules implementation and local QA are complete.
 
 Sprint 19 import/export completion implementation and local QA are complete.
+
+Sprint 20 production pilot hardening implementation and local QA are complete.

@@ -24,6 +24,10 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compos
 
 Keep `backups/` off git and copy backups to storage outside this server.
 
+For the first personal pilot, the selected off-server backup approach is a
+manual encrypted copy to a local machine controlled by the user after the SQLite
+backup command succeeds. Automated cloud backup remains deferred.
+
 ## Restore
 
 Stop the app first:

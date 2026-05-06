@@ -12,10 +12,14 @@ Use this checklist before accepting real personal SMS payloads.
 - [ ] The selected Android forwarder has been validated with fake-device SMS payloads.
 - [ ] Header support for `X-Inbound-SMS-Secret` has been validated on device, or a narrowly scoped fallback endpoint has been implemented.
 - [ ] SQLite backup and restore have been smoke-tested with fake production-like data.
-- [ ] Off-server backup storage has been selected and documented.
+- [ ] At least one encrypted off-server backup copy exists outside the VPS.
 - [ ] JSON export has been tested and confirmed to omit raw SMS bodies by default.
+- [ ] `GET /api/ops/readiness` has no blocker failures other than device-only checks.
 - [ ] Logs have been reviewed to confirm full raw SMS bodies are not emitted.
 - [ ] The review UI raw SMS detail behavior has been checked on a trusted local network.
+
+Current Sprint 20 status: no-go for real SMS until physical Android forwarder
+validation passes.
 
 ## Rollback
 
