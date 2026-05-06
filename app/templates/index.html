@@ -123,6 +123,10 @@
         padding: 14px;
       }
 
+      .panel.wide {
+        grid-column: 1 / -1;
+      }
+
       .queue {
         display: grid;
         gap: 8px;
@@ -146,6 +150,12 @@
         display: grid;
         gap: 10px;
         grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .filters {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
       }
 
       .row {
@@ -187,6 +197,30 @@
         padding: 4px 8px;
       }
 
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      table {
+        border-collapse: collapse;
+        min-width: 980px;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border-bottom: 1px solid #e2e7ef;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        color: #546171;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+      }
+
       .message {
         min-height: 22px;
       }
@@ -211,7 +245,8 @@
 
         .shell,
         .topbar,
-        .grid {
+        .grid,
+        .filters {
           grid-template-columns: 1fr;
         }
       }
@@ -278,6 +313,73 @@
             <pre id="metadata"></pre>
           </section>
         </section>
+
+        <section class="panel wide stack" data-testid="ledger-search-panel">
+          <div class="row">
+            <h2>Ledger Search</h2>
+            <span id="ledgerCount" class="status">0</span>
+          </div>
+          <div class="filters">
+            <label>Date from<input id="ledgerDateFrom" type="date"></label>
+            <label>Date to<input id="ledgerDateTo" type="date"></label>
+            <label>Account<input id="ledgerAccount" placeholder="acct_bank_1"></label>
+            <label>Type<input id="ledgerTransactionType" placeholder="debit"></label>
+            <label>Purpose<input id="ledgerPurpose" placeholder="expense"></label>
+            <label>Category<input id="ledgerCategory" placeholder="food_delivery"></label>
+            <label>Merchant<input id="ledgerMerchant" placeholder="merchant"></label>
+            <label>Amount min<input id="ledgerAmountMin" inputmode="decimal"></label>
+            <label>Amount max<input id="ledgerAmountMax" inputmode="decimal"></label>
+            <label>Review status<input id="ledgerReviewStatus" placeholder="reviewed"></label>
+            <label>Duplicate status<input id="ledgerDuplicateStatus" placeholder="unique"></label>
+            <label>Ledger status<input id="ledgerLedgerStatus" placeholder="included"></label>
+            <label>Source<input id="ledgerSource" placeholder="sms"></label>
+            <label>Sort by
+              <select id="ledgerSortBy">
+                <option value="transaction_date">transaction_date</option>
+                <option value="amount">amount</option>
+                <option value="merchant">merchant</option>
+                <option value="account_id">account_id</option>
+                <option value="created_at">created_at</option>
+                <option value="updated_at">updated_at</option>
+              </select>
+            </label>
+            <label>Sort dir
+              <select id="ledgerSortDir">
+                <option value="desc">desc</option>
+                <option value="asc">asc</option>
+              </select>
+            </label>
+            <label>Limit<input id="ledgerLimit" type="number" min="1" max="100" value="50"></label>
+            <label>Offset<input id="ledgerOffset" type="number" min="0" value="0"></label>
+            <label>
+              Include deleted
+              <select id="ledgerIncludeDeleted">
+                <option value="false">false</option>
+                <option value="true">true</option>
+              </select>
+            </label>
+          </div>
+          <div class="row">
+            <button id="loadLedgerTransactions" type="button">Search Ledger</button>
+          </div>
+          <div id="ledgerMessage" class="message muted"></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Merchant</th>
+                  <th>Account</th>
+                  <th>Purpose</th>
+                  <th>Status</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody id="ledgerResults" data-testid="ledger-results"></tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </main>
 
@@ -338,14 +440,28 @@
           const button = document.createElement("button");
           button.type = "button";
           button.className = `queue-item ${item.raw_sms_id === state.selectedId ? "active" : ""}`;
-          button.innerHTML = `
-            <strong>${candidate.merchant_canonical || candidate.merchant_raw || item.sender}</strong>
-            <span>${candidate.amount || "-"} · ${candidate.transaction_date || "-"} · ${candidate.review_status || "-"}</span>
-            <span class="muted">${item.sender} · ${item.received_at}</span>
-          `;
+          appendText(
+            button,
+            "strong",
+            candidate.merchant_canonical || candidate.merchant_raw || item.sender || "-"
+          );
+          appendText(
+            button,
+            "span",
+            `${candidate.amount || "-"} · ${candidate.transaction_date || "-"} · ${candidate.review_status || "-"}`
+          );
+          appendText(button, "span", `${item.sender || "-"} · ${item.received_at || "-"}`, "muted");
           button.addEventListener("click", () => selectItem(item.raw_sms_id));
           list.appendChild(button);
         });
+      }
+
+      function appendText(parent, tagName, text, className = "") {
+        const node = document.createElement(tagName);
+        if (className) node.className = className;
+        node.textContent = text;
+        parent.appendChild(node);
+        return node;
       }
 
       function renderDetail(item, detail = null) {
@@ -355,7 +471,8 @@
         fields.forEach((field) => {
           const node = document.createElement("div");
           node.className = "field";
-          node.innerHTML = `<div class="label">${field}</div><div class="value">${candidate[field] ?? "-"}</div>`;
+          appendText(node, "div", field, "label");
+          appendText(node, "div", candidate[field] ?? "-", "value");
           fieldContainer.appendChild(node);
         });
         correctionFields.forEach((field) => {
@@ -365,6 +482,69 @@
         });
         document.querySelector("#rawBody").textContent = detail ? detail.body : "";
         document.querySelector("#metadata").textContent = JSON.stringify(candidate, null, 2);
+      }
+
+      function ledgerParams() {
+        const mapping = {
+          date_from: "#ledgerDateFrom",
+          date_to: "#ledgerDateTo",
+          account_id: "#ledgerAccount",
+          transaction_type: "#ledgerTransactionType",
+          purpose: "#ledgerPurpose",
+          category: "#ledgerCategory",
+          merchant: "#ledgerMerchant",
+          amount_min: "#ledgerAmountMin",
+          amount_max: "#ledgerAmountMax",
+          review_status: "#ledgerReviewStatus",
+          duplicate_status: "#ledgerDuplicateStatus",
+          ledger_status: "#ledgerLedgerStatus",
+          source: "#ledgerSource",
+          sort_by: "#ledgerSortBy",
+          sort_dir: "#ledgerSortDir",
+          limit: "#ledgerLimit",
+          offset: "#ledgerOffset",
+          include_deleted: "#ledgerIncludeDeleted"
+        };
+        const params = new URLSearchParams();
+        Object.entries(mapping).forEach(([key, selector]) => {
+          const value = document.querySelector(selector).value.trim();
+          if (value) params.set(key, value);
+        });
+        return params;
+      }
+
+      function renderLedgerResults(items) {
+        const body = document.querySelector("#ledgerResults");
+        body.replaceChildren();
+        items.forEach((item) => {
+          const row = document.createElement("tr");
+          appendText(row, "td", item.transaction_date || "-");
+          appendText(row, "td", item.amount || "-");
+          appendText(row, "td", item.merchant_canonical || item.merchant_raw || "-");
+          appendText(row, "td", item.account_id || "-");
+          appendText(row, "td", `${item.transaction_type || "-"} / ${item.purpose || "-"}`);
+          appendText(
+            row,
+            "td",
+            `${item.review_status || "-"} · ${item.duplicate_status || "-"} · ${item.ledger_status || "-"}`
+          );
+          appendText(row, "td", item.source || "-");
+          body.appendChild(row);
+        });
+      }
+
+      async function loadLedgerTransactions() {
+        try {
+          const params = ledgerParams();
+          const payload = await api(`/api/ledger-transactions?${params.toString()}`, {
+            headers: secretHeaders()
+          });
+          renderLedgerResults(payload.items || []);
+          document.querySelector("#ledgerCount").textContent = String(payload.total || 0);
+          show("#ledgerMessage", payload.total ? "Loaded ledger transactions." : "No matching transactions.", "success");
+        } catch (error) {
+          show("#ledgerMessage", error.message, "error");
+        }
       }
 
       async function loadQueue() {
@@ -457,6 +637,7 @@
       }
 
       document.querySelector("#loadQueue").addEventListener("click", loadQueue);
+      document.querySelector("#loadLedgerTransactions").addEventListener("click", loadLedgerTransactions);
       document.querySelector("#saveCorrection").addEventListener("click", saveCorrection);
       document.querySelector("#markReviewed").addEventListener("click", markReviewed);
       document.querySelector("#promote").addEventListener("click", promote);

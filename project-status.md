@@ -2,7 +2,7 @@
 
 ## Current Sprint
 
-Sprint 13: Manual Transaction Management and Sprint 14: Cash Tracking
+Sprint 15: Structured Search and Filters
 
 ## Sprint Status
 
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 14: Cash Tracking
+Sprint 15: Structured Search and Filters
 
 ## Current Focus
 
-Plan Sprint 15 structured search and filters.
+Prepare Sprint 16 deterministic analysis screen.
 
 ## Current Branch
 
-`sprint-13-14-manual-transactions-search-analysis`
+`sprint-15-structured-search-filters`
 
 ## Open Blockers
 
@@ -59,3 +59,6 @@ and PR #9 was merged to `main`.
 
 Sprint 13 manual transaction management and Sprint 14 cash tracking
 implementation and local QA are complete; CI passed on PR #10.
+
+Sprint 15 structured search and filters implementation and local QA are
+complete.

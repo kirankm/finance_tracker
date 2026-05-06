@@ -1,11 +1,12 @@
 from collections.abc import Awaitable, Callable
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
+from decimal import Decimal
 from hashlib import sha256
 from secrets import compare_digest
 from typing import Annotated
 from uuid import uuid4
 
-from fastapi import Depends, FastAPI, Request, Response, status
+from fastapi import Depends, FastAPI, Query, Request, Response, status
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -27,6 +28,7 @@ from app.ledger_promotion import (
     LedgerPromotionResponse,
     promote_reviewed_sms_candidate,
 )
+from app.ledger_search import LedgerSearchParams, search_ledger_transactions
 from app.management import (
     AccountCreatePayload,
     AccountListResponse,
@@ -308,6 +310,55 @@ def ledger_transaction_correct(
     db_session: Annotated[Session, Depends(get_db_session)],
 ) -> LedgerTransactionCorrectionResponse:
     return correct_ledger_transaction(db_session, transaction_id, payload)
+
+
+@app.get("/api/ledger-transactions")
+def ledger_transactions_search(
+    db_session: Annotated[Session, Depends(get_db_session)],
+    id: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    account_id: str | None = None,
+    transaction_type: str | None = None,
+    purpose: str | None = None,
+    category: str | None = None,
+    merchant: str | None = None,
+    amount_min: Decimal | None = None,
+    amount_max: Decimal | None = None,
+    review_status: str | None = None,
+    duplicate_status: str | None = None,
+    ledger_status: str | None = None,
+    source: str | None = None,
+    include_deleted: bool = False,
+    sort_by: str = "transaction_date",
+    sort_dir: str = "desc",
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+) -> dict[str, object]:
+    return search_ledger_transactions(
+        db_session,
+        LedgerSearchParams(
+            transaction_id=id,
+            date_from=date_from,
+            date_to=date_to,
+            account_id=account_id,
+            transaction_type=transaction_type,
+            purpose=purpose,
+            category=category,
+            merchant=merchant,
+            amount_min=amount_min,
+            amount_max=amount_max,
+            review_status=review_status,
+            duplicate_status=duplicate_status,
+            ledger_status=ledger_status,
+            source=source,
+            include_deleted=include_deleted,
+            sort_by=sort_by,
+            sort_dir=sort_dir,
+            limit=limit,
+            offset=offset,
+        ),
+    )
 
 
 @app.post("/api/manual-transactions", status_code=status.HTTP_201_CREATED)
