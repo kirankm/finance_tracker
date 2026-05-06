@@ -26,6 +26,22 @@ from app.ledger_promotion import (
     LedgerPromotionResponse,
     promote_reviewed_sms_candidate,
 )
+from app.management import (
+    AccountCreatePayload,
+    AccountListResponse,
+    AccountUpdatePayload,
+    CategoryCreatePayload,
+    CategoryListResponse,
+    CategoryUpdatePayload,
+    DeletePayload,
+    create_account,
+    create_category,
+    delete_category,
+    list_accounts,
+    list_categories,
+    update_account,
+    update_category,
+)
 from app.models import RawSmsMessage
 from app.review_queue import (
     ReviewDecisionPayload,
@@ -118,6 +134,8 @@ async def require_inbound_sms_secret(
             or request.url.path.startswith("/api/review-queue")
             or request.url.path.startswith("/api/ledger-transactions")
             or request.url.path.startswith("/api/export")
+            or request.url.path.startswith("/api/accounts")
+            or request.url.path.startswith("/api/categories")
         )
         and not is_authorized_inbound_sms_request(request)
     ):
@@ -291,6 +309,64 @@ def export_ledger_transactions_csv(
     db_session: Annotated[Session, Depends(get_db_session)],
 ) -> Response:
     return export_ledger_csv(db_session)
+
+
+@app.get("/api/accounts", response_model=AccountListResponse)
+def accounts_list(
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> AccountListResponse:
+    return list_accounts(db_session)
+
+
+@app.post("/api/accounts", status_code=status.HTTP_201_CREATED)
+def accounts_create(
+    payload: AccountCreatePayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return create_account(db_session, payload)
+
+
+@app.patch("/api/accounts/{account_id}")
+def accounts_update(
+    account_id: str,
+    payload: AccountUpdatePayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return update_account(db_session, account_id, payload)
+
+
+@app.get("/api/categories", response_model=CategoryListResponse)
+def categories_list(
+    db_session: Annotated[Session, Depends(get_db_session)],
+    include_deleted: bool = False,
+) -> CategoryListResponse:
+    return list_categories(db_session, include_deleted)
+
+
+@app.post("/api/categories", status_code=status.HTTP_201_CREATED)
+def categories_create(
+    payload: CategoryCreatePayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return create_category(db_session, payload)
+
+
+@app.patch("/api/categories/{category_id}")
+def categories_update(
+    category_id: str,
+    payload: CategoryUpdatePayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return update_category(db_session, category_id, payload)
+
+
+@app.delete("/api/categories/{category_id}")
+def categories_delete(
+    category_id: str,
+    payload: DeletePayload,
+    db_session: Annotated[Session, Depends(get_db_session)],
+) -> dict[str, object]:
+    return delete_category(db_session, category_id, payload)
 
 
 @app.get("/", response_class=HTMLResponse)

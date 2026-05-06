@@ -340,7 +340,7 @@ GET /api/export/json
 ```
 
 The JSON export includes accounts, ledger transactions, raw SMS metadata, and
-audit events. It does not include raw SMS bodies by default.
+categories, and audit events. It does not include raw SMS bodies by default.
 
 Export ledger CSV:
 
@@ -350,6 +350,26 @@ GET /api/export/ledger-transactions.csv
 
 Raw SMS body bulk export is intentionally deferred because it needs a separate
 privacy decision and user-facing warning.
+
+## Account and Category Management Development Contract
+
+Sprint 12 adds authenticated management endpoints using the same shared secret
+header:
+
+```text
+GET /api/accounts
+POST /api/accounts
+PATCH /api/accounts/{account_id}
+
+GET /api/categories
+POST /api/categories
+PATCH /api/categories/{category_id}
+DELETE /api/categories/{category_id}
+```
+
+Account updates create `account_updated` audit events with before/after values.
+Category deletes are soft deletes. Deleting a category used by active ledger
+transactions returns `409`.
 
 ## Selected Android Forwarder Pilot
 

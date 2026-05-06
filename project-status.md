@@ -2,7 +2,7 @@
 
 ## Current Sprint
 
-Sprint 11: Import, Export, Backup, and Real-Use Readiness
+Sprint 12: Account and Category Management
 
 ## Sprint Status
 
@@ -17,11 +17,11 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 10: Minimal Review UI
+Sprint 11: Import, Export, Backup, and Real-Use Readiness
 
 ## Current Focus
 
-Complete Sprint 11 local checks and continue to Sprint 12.
+Review Sprint 10 through Sprint 12 stacked implementation.
 
 ## Current Branch
 

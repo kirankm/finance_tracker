@@ -8,7 +8,7 @@ from fastapi.responses import Response
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Account, AuditEvent, LedgerTransaction, RawSmsMessage
+from app.models import Account, AuditEvent, Category, LedgerTransaction, RawSmsMessage
 
 
 def export_json(db_session: Session) -> dict[str, Any]:
@@ -32,6 +32,10 @@ def export_json(db_session: Session) -> dict[str, Any]:
             for raw_sms in db_session.scalars(
                 select(RawSmsMessage).order_by(RawSmsMessage.received_at, RawSmsMessage.id)
             )
+        ],
+        "categories": [
+            category_to_dict(category)
+            for category in db_session.scalars(select(Category).order_by(Category.id))
         ],
         "audit_events": [
             audit_event_to_dict(audit_event)
@@ -132,6 +136,18 @@ def raw_sms_to_metadata(raw_sms: RawSmsMessage) -> dict[str, Any]:
         "body_exported": False,
         "created_at": serialize(raw_sms.created_at),
         "updated_at": serialize(raw_sms.updated_at),
+    }
+
+
+def category_to_dict(category: Category) -> dict[str, Any]:
+    return {
+        "id": category.id,
+        "name": category.name,
+        "intent_type": category.intent_type,
+        "deleted_at": serialize(category.deleted_at),
+        "deleted_reason": category.deleted_reason,
+        "created_at": serialize(category.created_at),
+        "updated_at": serialize(category.updated_at),
     }
 
 

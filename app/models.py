@@ -8,7 +8,14 @@ from sqlalchemy.types import TypeDecorator
 
 from app.database import Base
 
-__all__ = ["Account", "AuditEvent", "Base", "LedgerTransaction", "RawSmsMessage"]
+__all__ = [
+    "Account",
+    "AuditEvent",
+    "Base",
+    "Category",
+    "LedgerTransaction",
+    "RawSmsMessage",
+]
 
 
 class UTCDateTime(TypeDecorator[datetime]):
@@ -64,6 +71,14 @@ class Account(Base, TimestampMixin, SoftDeleteMixin):
     audit_events: Mapped[list["AuditEvent"]] = relationship(
         back_populates="account", cascade="save-update, merge"
     )
+
+
+class Category(Base, TimestampMixin, SoftDeleteMixin):
+    __tablename__ = "categories"
+
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    intent_type: Mapped[str | None] = mapped_column(String(40), nullable=True)
 
 
 class LedgerTransaction(Base, TimestampMixin, SoftDeleteMixin):
