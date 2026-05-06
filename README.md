@@ -19,14 +19,14 @@ A native Android SMS-reading app is out of scope for V1 and can be reconsidered 
 
 ## Current State
 
-Sprint 14 cash tracking is merged to `main`. The app has authenticated SMS
+Sprint 15 structured search and filters is merged to `main`. The app has authenticated SMS
 ingestion, the selected Android forwarder adapter, deterministic fake-rule
 enrichment for account mapping, merchant normalization, and category assignment,
 an authenticated backend review queue for stored SMS transaction candidates, an
 authenticated path for promoting reviewed fake candidates into ledger
 transactions with deterministic duplicate and ledger sanity checks, account and
 category management, manual transaction workflows, cash balance updates, and
-export/backup documentation.
+structured ledger search/filtering.
 
 ## Development Commands
 
@@ -496,6 +496,38 @@ Search responses include transaction fields, status fields, selected
 source/audit context, and audit event counts. They do not include raw SMS
 bodies; raw SMS body inspection remains limited to explicit review detail
 endpoints.
+
+## Analysis Development Contract
+
+Sprint 16 adds an authenticated deterministic analysis endpoint:
+
+```text
+GET /api/analysis/summary
+```
+
+Supported query parameters:
+
+```text
+month=YYYY-MM
+date_from=YYYY-MM-DD
+date_to=YYYY-MM-DD
+```
+
+Use `month` for a calendar-month summary, or provide `date_from` and `date_to`
+together for an explicit date range. Financial totals include only ledger
+transactions that are reviewed, unique, included, and not soft-deleted.
+
+The response includes:
+
+- income vs normal expense totals
+- normal expense totals by category
+- normal expense totals by account
+- separate totals for investment, savings, transfer, refund, reversal, and cash update purposes
+- cash balance change totals
+- quality counts for review-needed, unmapped, and excluded-from-total rows
+
+Analysis uses deterministic ledger fields only. LLM-written insights, budgets,
+forecasting, and investment holdings are out of scope.
 
 ## Selected Android Forwarder Pilot
 

@@ -380,6 +380,23 @@
             </table>
           </div>
         </section>
+
+        <section class="panel wide stack" data-testid="analysis-panel">
+          <div class="row">
+            <h2>Analysis</h2>
+            <span id="analysisPeriod" class="status">-</span>
+          </div>
+          <div class="filters">
+            <label>Month<input id="analysisMonth" type="month"></label>
+            <label>Date from<input id="analysisDateFrom" type="date"></label>
+            <label>Date to<input id="analysisDateTo" type="date"></label>
+          </div>
+          <div class="row">
+            <button id="loadAnalysis" type="button">Load Analysis</button>
+          </div>
+          <div id="analysisMessage" class="message muted"></div>
+          <div id="analysisResults" class="grid" data-testid="analysis-results"></div>
+        </section>
       </div>
     </main>
 
@@ -547,6 +564,63 @@
         }
       }
 
+      function analysisParams() {
+        const params = new URLSearchParams();
+        const month = document.querySelector("#analysisMonth").value.trim();
+        const dateFrom = document.querySelector("#analysisDateFrom").value.trim();
+        const dateTo = document.querySelector("#analysisDateTo").value.trim();
+        if (month) {
+          params.set("month", month);
+        } else {
+          if (dateFrom) params.set("date_from", dateFrom);
+          if (dateTo) params.set("date_to", dateTo);
+        }
+        return params;
+      }
+
+      function appendMetric(parent, label, value) {
+        const node = document.createElement("div");
+        node.className = "field";
+        appendText(node, "div", label, "label");
+        appendText(node, "div", value, "value");
+        parent.appendChild(node);
+      }
+
+      function renderAnalysis(payload) {
+        const results = document.querySelector("#analysisResults");
+        results.replaceChildren();
+        const totals = payload.income_vs_expense || {};
+        appendMetric(results, "Income", totals.income || "0.00");
+        appendMetric(results, "Normal expense", totals.normal_expense || "0.00");
+        const cash = payload.cash_balance_changes || {};
+        appendMetric(results, "Cash changes", `${cash.total || "0.00"} (${cash.count || 0})`);
+        const quality = payload.quality_counts || {};
+        appendMetric(results, "Review needed", String(quality.review_needed || 0));
+        appendMetric(results, "Unmapped categories", String(quality.unmapped_category || 0));
+        appendMetric(results, "Excluded from totals", String(quality.excluded_from_totals || 0));
+        const topCategory = (payload.spending_by_category || [])[0];
+        appendMetric(
+          results,
+          "Top category",
+          topCategory ? `${topCategory.category}: ${topCategory.total}` : "-"
+        );
+        const period = payload.period || {};
+        document.querySelector("#analysisPeriod").textContent = `${period.date_from || "-"} to ${period.date_to || "-"}`;
+      }
+
+      async function loadAnalysis() {
+        try {
+          const params = analysisParams();
+          const payload = await api(`/api/analysis/summary?${params.toString()}`, {
+            headers: secretHeaders()
+          });
+          renderAnalysis(payload);
+          show("#analysisMessage", "Loaded analysis.", "success");
+        } catch (error) {
+          show("#analysisMessage", error.message, "error");
+        }
+      }
+
       async function loadQueue() {
         try {
           const payload = await api("/api/review-queue", { headers: secretHeaders() });
@@ -638,6 +712,7 @@
 
       document.querySelector("#loadQueue").addEventListener("click", loadQueue);
       document.querySelector("#loadLedgerTransactions").addEventListener("click", loadLedgerTransactions);
+      document.querySelector("#loadAnalysis").addEventListener("click", loadAnalysis);
       document.querySelector("#saveCorrection").addEventListener("click", saveCorrection);
       document.querySelector("#markReviewed").addEventListener("click", markReviewed);
       document.querySelector("#promote").addEventListener("click", promote);

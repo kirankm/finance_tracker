@@ -107,3 +107,20 @@ def test_review_ui_exposes_structured_ledger_search_filters() -> None:
     assert "ledgerSource" in search_region
     assert "ledgerIncludeDeleted" in search_region
     assert "rawBody" not in search_region
+
+
+def test_review_ui_exposes_analysis_panel() -> None:
+    with make_test_client() as client:
+        response = client.get("/")
+
+    html = response.text
+    analysis_region = html.split('data-testid="analysis-panel"', maxsplit=1)[1].split(
+        "</section>", maxsplit=1
+    )[0]
+    assert "/api/analysis/summary" in html
+    assert "analysisMonth" in analysis_region
+    assert "analysisDateFrom" in analysis_region
+    assert "analysisDateTo" in analysis_region
+    assert "loadAnalysis" in analysis_region
+    assert "analysisResults" in analysis_region
+    assert "rawBody" not in analysis_region

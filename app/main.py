@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.analysis import AnalysisParams, get_analysis_summary
 from app.cash_tracking import CashBalanceUpdatePayload, update_cash_balance
 from app.config import get_settings
 from app.corrections import (
@@ -146,6 +147,7 @@ async def require_inbound_sms_secret(
         (
             request.url.path in protected_paths
             or request.url.path.startswith("/api/review-queue")
+            or request.url.path.startswith("/api/analysis")
             or request.url.path.startswith("/api/ledger-transactions")
             or request.url.path.startswith("/api/manual-transactions")
             or request.url.path.startswith("/api/export")
@@ -358,6 +360,19 @@ def ledger_transactions_search(
             limit=limit,
             offset=offset,
         ),
+    )
+
+
+@app.get("/api/analysis/summary")
+def analysis_summary(
+    db_session: Annotated[Session, Depends(get_db_session)],
+    month: str | None = None,
+    date_from: date | None = None,
+    date_to: date | None = None,
+) -> dict[str, object]:
+    return get_analysis_summary(
+        db_session,
+        AnalysisParams(month=month, date_from=date_from, date_to=date_to),
     )
 
 
