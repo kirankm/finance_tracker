@@ -2,11 +2,11 @@
 
 ## Current Sprint
 
-Sprint 9: Corrections and Rule Learning Foundation
+Sprint 12: Account and Category Management
 
 ## Sprint Status
 
-done
+review
 
 Allowed values:
 - planning
@@ -17,15 +17,15 @@ Allowed values:
 
 ## Last Completed Sprint
 
-Sprint 9: Corrections and Rule Learning Foundation
+Sprint 11: Import, Export, Backup, and Real-Use Readiness
 
 ## Current Focus
 
-Plan Sprint 10 minimal review UI.
+Review Sprint 10 through Sprint 12 stacked implementation.
 
 ## Current Branch
 
-`main`
+`sprint-10-minimal-review-ui`
 
 ## Open Blockers
 
